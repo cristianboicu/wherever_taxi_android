@@ -8,9 +8,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -22,6 +25,8 @@ import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
@@ -31,6 +36,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private lateinit var map: GoogleMap
     private lateinit var drawer: DrawerLayout
     private var permissionDenied = false
+
+    private lateinit var mBottomSheetLayout: ConstraintLayout
+    private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var header_Arrow_Image: View
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
@@ -50,12 +59,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         binding.lifecycleOwner = this
 
         setUpUi(binding, savedInstanceState)
+
         return binding.root
     }
 
     private fun setUpUi(binding: FragmentHomeBinding, savedInstanceState: Bundle?) {
         val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
         mMapFragment?.getMapAsync(this)
+
+        mBottomSheetLayout = binding.bottomSheet.bottomSheetLayout
+        sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
+
         drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
         binding.btnNavigationDrawer.setOnClickListener {
             openDrawer()
@@ -123,12 +137,4 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             .show()
     }
 
-    companion object {
-        /**
-         * Request code for location permission request.
-         *
-         * @see .onRequestPermissionsResult
-         */
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-    }
 }
