@@ -11,6 +11,8 @@
         <entry key="app/src/main/res/layout/btn_sign_in_with.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_log_in.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.29583333333333334" />
+        <entry key="app/src/main/res/menu/drawer_view.xml" value="0.1" />
       </map>
     </option>
   </component>

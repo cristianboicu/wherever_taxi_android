@@ -5,4 +5,6 @@
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_facebook">Sign in with Facebook</string>
     <string name="sign_in">Sign In</string>
+    <string name="ride_history">Ride History</string>
+    <string name="profile">Profile</string>
 </resources>

@@ -13,7 +13,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
@@ -27,13 +29,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     //    private lateinit var mMapFragment: SupportMapFragment
     private lateinit var map: GoogleMap
+    private lateinit var drawer: DrawerLayout
     private var permissionDenied = false
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()) {result ->
+            ActivityResultContracts.RequestMultiplePermissions()) { result ->
             var allAreGranted = true
-            for(b in result.values) {
+            for (b in result.values) {
                 allAreGranted = allAreGranted && b
             }
         }
@@ -41,7 +44,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
+    ): View? {
         val binding: FragmentHomeBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         binding.lifecycleOwner = this
@@ -53,7 +56,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun setUpUi(binding: FragmentHomeBinding, savedInstanceState: Bundle?) {
         val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
         mMapFragment?.getMapAsync(this)
+        drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
+        binding.btnNavigationDrawer.setOnClickListener {
+            openDrawer()
+        }
+    }
 
+    private fun openDrawer() {
+        activity?.let {
+            drawer.openDrawer(GravityCompat.START)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -65,7 +77,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
-
         // 1. Check if permissions are granted, if so, enable the my location layer
         if (ContextCompat.checkSelfPermission(
                 requireActivity(),
@@ -84,42 +95,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
         activityResultLauncher.launch(appPerms)
-//
-//        // 2. If if a permission rationale dialog should be shown
-//        if (ActivityCompat.shouldShowRequestPermissionRationale(
-//                requireActivity(),
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) || ActivityCompat.shouldShowRequestPermissionRationale(
-//                requireActivity(),
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            )
-//        ) {
-//            PermissionUtils.RationaleDialog.newInstance(
-//                LOCATION_PERMISSION_REQUEST_CODE, true
-//            ).show(supportFragmentManager, "dialog")
-//            return
-//        }
 
-//        val requestPermissionLauncher =
-//            registerForActivityResult(ActivityResultContracts.RequestPermission()
-//            ) { isGranted: Boolean ->
-//                if (isGranted) {
-//                    // Permission is granted. Continue the action or workflow in your
-//                    // app.
-//                } else {
-//                    // Explain to the user that the feature is unavailable because the
-//                    // features requires a permission that the user has denied. At the
-//                    // same time, respect the user's decision. Don't link to system
-//                    // settings in an effort to convince the user to change their
-//                    // decision.
-//                }
-//            }
-//
-//        val appPerms = arrayOf(
-//            Manifest.permission.ACCESS_FINE_LOCATION,
-//            Manifest.permission.ACCESS_COARSE_LOCATION
-//        )
-//        requestPermissionLauncher.launch(appPerms.toString())
     }
 
 //    override fun onSaveInstanceState(outState: Bundle) {
@@ -146,6 +122,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         Toast.makeText(context, "Current location:\n$location", Toast.LENGTH_LONG)
             .show()
     }
+
     companion object {
         /**
          * Request code for location permission request.
