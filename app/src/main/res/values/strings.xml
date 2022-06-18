@@ -7,4 +7,5 @@
     <string name="sign_in">Sign In</string>
     <string name="ride_history">Ride History</string>
     <string name="profile">Profile</string>
+    <string name="enter_verification_code">Enter verification code</string>
 </resources>
