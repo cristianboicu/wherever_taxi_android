@@ -17,6 +17,7 @@
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_log_in.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_splash_screen.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_verification_code.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/menu/drawer_view.xml" value="0.1" />
       </map>

@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation"
-    app:startDestination="@id/logInFragment">
+    app:startDestination="@id/splashScreenFragment">
 
     <fragment
         android:id="@+id/logInFragment"
@@ -40,5 +40,20 @@
         <action
             android:id="@+id/action_verificationCodeFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/splashScreenFragment"
+        android:name="com.cristianboicu.wherevertaxi.ui.splashScreen.SplashScreenFragment"
+        android:label="SplashScreenFragment" >
+        <action
+            android:id="@+id/action_splashScreenFragment_to_logInFragment"
+            app:destination="@id/logInFragment"
+            app:popUpTo="@+id/splashScreenFragment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_splashScreenFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@+id/splashScreenFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 </navigation>

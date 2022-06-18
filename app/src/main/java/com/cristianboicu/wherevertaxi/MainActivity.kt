@@ -35,8 +35,7 @@ class MainActivity : AppCompatActivity(), LogInFragment.SendVerificationCode {
         setContentView(R.layout.activity_main)
         firebaseAuth = FirebaseAuth.getInstance()
 //        val firebaseAuthSettings = firebaseAuth.firebaseAuthSettings
-        Log.d("Logged", firebaseAuth.currentUser.toString())
-// Configure faking the auto-retrieval with the whitelisted numbers.
+    // Configure faking the auto-retrieval with the whitelisted numbers.
 //        firebaseAuthSettings.setAutoRetrievedSmsCodeForPhoneNumber("+37368026688", "123144")
         setupDrawerLayout()
     }
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity(), LogInFragment.SendVerificationCode {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     VerificationCodeFragment.getInstance().navigateHome()
-                    Toast.makeText(this@MainActivity," e.message", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, " e.message", Toast.LENGTH_LONG).show()
 
                 } else {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()

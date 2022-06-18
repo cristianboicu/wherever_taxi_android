@@ -1,20 +1,43 @@
 package com.cristianboicu.wherevertaxi.ui.splashScreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
+import com.cristianboicu.wherevertaxi.databinding.FragmentSplashScreenBinding
+import com.google.firebase.auth.FirebaseAuth
 
+@SuppressLint("CustomSplashScreen")
 class SplashScreenFragment : Fragment() {
+    private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_splash_screen, container, false)
+        val binding: FragmentSplashScreenBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_splash_screen, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        firebaseAuth = FirebaseAuth.getInstance()
+        if (firebaseAuth.currentUser != null) {
+            this.findNavController().navigate(
+                SplashScreenFragmentDirections.actionSplashScreenFragmentToHomeFragment()
+            )
+        } else {
+            this.findNavController().navigate(
+                SplashScreenFragmentDirections.actionSplashScreenFragmentToLogInFragment()
+            )
+        }
+    }
 }
