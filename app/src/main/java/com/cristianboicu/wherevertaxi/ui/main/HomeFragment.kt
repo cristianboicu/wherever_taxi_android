@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,20 +24,16 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
-    //    private lateinit var mMapFragment: SupportMapFragment
     private lateinit var map: GoogleMap
     private lateinit var drawer: DrawerLayout
-    private var permissionDenied = false
 
     private lateinit var mBottomSheetLayout: ConstraintLayout
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var header_Arrow_Image: View
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
@@ -47,6 +41,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             var allAreGranted = true
             for (b in result.values) {
                 allAreGranted = allAreGranted && b
+            }
+
+            if (allAreGranted) {
+                enableMyLocation()
             }
         }
 
@@ -63,6 +61,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
+    }
+
     private fun setUpUi(binding: FragmentHomeBinding, savedInstanceState: Bundle?) {
         val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
         mMapFragment?.getMapAsync(this)
@@ -70,7 +73,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         mBottomSheetLayout = binding.bottomSheet.bottomSheetLayout
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
 
-        drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
         binding.btnNavigationDrawer.setOnClickListener {
             openDrawer()
         }
@@ -112,10 +114,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     }
 
-//    override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState)
-//        mMapFragment.onSaveInstanceState(outState)
-//    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+//        HomeFragment.onSaveInstanceState(outState)
+    }
 
     /**
      * Displays a dialog with error message explaining that the location permission is missing.
