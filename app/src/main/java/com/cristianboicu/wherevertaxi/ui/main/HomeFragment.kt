@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -69,6 +71,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun setUpUi(binding: FragmentHomeBinding, savedInstanceState: Bundle?) {
         val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
         mMapFragment?.getMapAsync(this)
+
+        val locationButton = (mMapFragment!!.requireView().findViewById<View>("1".toInt())
+            .parent as View).findViewById<View>("2".toInt())
+        val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+        rlp.setMargins(0, 0, 30, 280)
 
         mBottomSheetLayout = binding.bottomSheet.bottomSheetLayout
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
@@ -140,3 +149,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     }
 
 }
+//
+//val locationButton =
+//    (mapFragment?.view?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
+//        Integer.parseInt("2")) as ImageView locationButton . setImageResource (R.drawable.ic_my_location_button)

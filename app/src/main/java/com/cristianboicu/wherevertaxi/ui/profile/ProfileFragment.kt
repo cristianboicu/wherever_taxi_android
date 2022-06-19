@@ -17,8 +17,8 @@ import com.cristianboicu.wherevertaxi.databinding.FragmentProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
-
 class ProfileFragment : Fragment() {
+    private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

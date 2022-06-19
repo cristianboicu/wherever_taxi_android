@@ -3,5 +3,6 @@
     <dimen name="small_value">8dp</dimen>
     <dimen name="medium_value">16dp</dimen>
     <dimen name="big_value">32dp</dimen>
+    <dimen name="very_big_value">48dp</dimen>
     <dimen name="big_value_text">32sp</dimen>
 </resources>

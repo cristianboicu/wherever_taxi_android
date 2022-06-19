@@ -29,7 +29,7 @@ class VerificationCodeFragment : Fragment() {
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_verification_code, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        Log.d("Aloha", "epta")
+
         instance = this
         return binding.root
     }
