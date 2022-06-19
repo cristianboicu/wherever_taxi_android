@@ -6,7 +6,9 @@
     <string name="sign_in_with_facebook">Sign in with Facebook</string>
     <string name="sign_in">Sign In</string>
     <string name="ride_history">Ride History</string>
-    <string name="profile">Profile</string>
     <string name="enter_verification_code">Enter verification code</string>
     <string name="wherever_taxi">Wherever Taxi</string>
+    <string name="profile">Profile</string>
+    <string name="log_out">Log out</string>
+    <string name="no_email_provided">No email provided</string>
 </resources>

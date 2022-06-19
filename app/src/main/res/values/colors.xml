@@ -17,6 +17,7 @@
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#000000</color>
 
+    <color name="red">#930000</color>
     <color name="gray_border">#B8B8B8</color>
     <color name="pressed_btn">#EAEAEA</color>
 

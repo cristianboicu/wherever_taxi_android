@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentProfileBinding
@@ -18,7 +19,8 @@ import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
 class ProfileFragment : Fragment() {
-    private lateinit var firebaseAuth: FirebaseAuth
+
+    lateinit var viewModel: ProfileViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,7 +30,17 @@ class ProfileFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
+        viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+        binding.viewModel = viewModel
+
         setUpUi(binding)
+
+        viewModel.loadedUser.observe(viewLifecycleOwner) {
+            it.let {
+                binding.user = it
+            }
+        }
+
         return binding.root
     }
 
@@ -36,7 +48,7 @@ class ProfileFragment : Fragment() {
         binding.imageButton.setOnClickListener {
             navigateBackHome()
         }
-        binding.tvLogOut.setOnClickListener {
+        binding.profileLogOut.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             restartApp()
         }
