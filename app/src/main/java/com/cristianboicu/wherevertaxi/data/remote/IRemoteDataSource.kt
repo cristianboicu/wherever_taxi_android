@@ -7,5 +7,5 @@ interface IRemoteDataSource {
 
     fun getLoggedUserId(): FirebaseUser?
 
-    fun getLoggedUserData(currentUser: FirebaseUser): User?
+    suspend fun getLoggedUserData(currentUser: FirebaseUser): User?
 }

@@ -8,6 +8,7 @@ buildscript {
     }
     dependencies {
         // Add this line
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.38.1")
         classpath 'com.google.gms:google-services:4.3.10'
         classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.0-beta01'
     }
@@ -15,6 +16,7 @@ buildscript {
         nav_version = '2.4.2'
         maps_version = '18.0.2'
         material_version = '1.6.0'
+        dagger_hilt_version = '2.38.1'
     }
 }
 

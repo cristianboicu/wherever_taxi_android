@@ -4,5 +4,5 @@ import com.cristianboicu.wherevertaxi.data.model.User
 
 interface IRepository {
 
-    fun getAuthenticatedUser(): User?
+    suspend fun getAuthenticatedUser(): User?
 }

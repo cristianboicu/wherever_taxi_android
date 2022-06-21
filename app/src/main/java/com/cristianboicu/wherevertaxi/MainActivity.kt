@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.ui.login.LogInFragment
 import com.cristianboicu.wherevertaxi.ui.verificationCode.VerificationCodeFragment
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants.DATABASE_URL
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -24,9 +25,10 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), LogInFragment.SendVerificationCode {
 
     private lateinit var verificationId: String
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity(), LogInFragment.SendVerificationCode {
         setTransparentStatusBar()
         firebaseAuth = FirebaseAuth.getInstance()
         database =
-            Firebase.database("https://wherever-taxi-default-rtdb.europe-west1.firebasedatabase.app/").reference
+            Firebase.database(DATABASE_URL).reference
 
 //        val firebaseAuthSettings = firebaseAuth.firebaseAuthSettings
         // Configure faking the auto-retrieval with the whitelisted numbers.

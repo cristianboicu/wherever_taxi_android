@@ -16,8 +16,10 @@ import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentProfileBinding
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     lateinit var viewModel: ProfileViewModel
