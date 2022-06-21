@@ -12,7 +12,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import com.cristianboicu.wherevertaxi.data.User
+import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.ui.login.LogInFragment
 import com.cristianboicu.wherevertaxi.ui.verificationCode.VerificationCodeFragment
 import com.google.android.material.navigation.NavigationView

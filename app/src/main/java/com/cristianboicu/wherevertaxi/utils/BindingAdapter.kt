@@ -3,7 +3,7 @@ package com.cristianboicu.wherevertaxi.utils
 import android.annotation.SuppressLint
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.cristianboicu.wherevertaxi.data.User
+import com.cristianboicu.wherevertaxi.data.model.User
 
 @SuppressLint("SetTextI18n")
 @BindingAdapter("userName")
