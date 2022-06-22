@@ -16,6 +16,7 @@ buildscript {
         nav_version = '2.4.2'
         maps_version = '18.0.2'
         material_version = '1.6.0'
+        version_retrofit = '2.9.0'
         dagger_hilt_version = '2.38.1'
     }
 }

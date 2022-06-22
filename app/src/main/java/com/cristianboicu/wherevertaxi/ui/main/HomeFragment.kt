@@ -5,10 +5,10 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -20,14 +20,24 @@ import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
+import com.cristianboicu.wherevertaxi.utils.EventObserver
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -36,6 +46,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     private lateinit var mBottomSheetLayout: ConstraintLayout
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    lateinit var viewModel: HomeViewModel
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var mCurrentLocation: Location
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
@@ -58,9 +71,48 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         binding.lifecycleOwner = this
 
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(this.requireActivity())
+
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         setUpUi(binding, savedInstanceState)
 
+        binding.viewModel = viewModel
+        binding.bottomSheet.viewModel = viewModel
+
+        setUpObserver()
+
+
         return binding.root
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun setUpObserver() {
+        viewModel.drawMarkers.observe(viewLifecycleOwner) {
+            for (marker in it) {
+                map.addMarker(marker)
+            }
+            if (it.isNotEmpty()) {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(it[it.size - 1].position, 11.6f))
+            }
+        }
+
+        viewModel.drawPolyLine.observe(viewLifecycleOwner) {
+            map.clear()
+            map.addPolyline(it)
+        }
+
+        viewModel.requestCurrentLocation.observe(viewLifecycleOwner){
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        mCurrentLocation = it
+                        viewModel.routeSelected(LatLng(it.latitude, it.longitude))
+                        Log.d("HomeFragment",
+                            "${mCurrentLocation.latitude} , ${mCurrentLocation.longitude}")
+                    }
+                }
+        }
     }
 
     override fun onResume() {
@@ -85,11 +137,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         binding.btnNavigationDrawer.setOnClickListener {
             openDrawer()
         }
+
     }
 
     private fun openDrawer() {
         activity?.let {
             drawer.openDrawer(GravityCompat.START)
+        }
+    }
+
+    fun createLocationRequest() {
+        val locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = Priority.PRIORITY_HIGH_ACCURACY
         }
     }
 
@@ -147,7 +208,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         Toast.makeText(context, "Current location:\n$location", Toast.LENGTH_LONG)
             .show()
     }
-
 }
 //
 //val locationButton =
