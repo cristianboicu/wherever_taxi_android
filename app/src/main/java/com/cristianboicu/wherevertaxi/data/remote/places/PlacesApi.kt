@@ -5,7 +5,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.RectangularBounds
-import com.google.android.libraries.places.api.model.TypeFilter
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.tasks.await
@@ -23,8 +22,8 @@ class PlacesApi @Inject constructor(private val placesClient: PlacesClient) : IP
         )
 
         val request =
-            FindAutocompletePredictionsRequest.builder() // Call either setLocationBias() OR setLocationRestriction().
-                .setLocationBias(bounds) //.setLocationRestriction(bounds)
+            FindAutocompletePredictionsRequest.builder()
+                .setLocationBias(bounds)
                 .setCountry("ro")
                 .setSessionToken(token)
                 .setQuery(query)
@@ -33,19 +32,14 @@ class PlacesApi @Inject constructor(private val placesClient: PlacesClient) : IP
         val predictionsList = mutableListOf<AutocompletePrediction>()
         try {
             val result = placesClient.findAutocompletePredictions(request).await()
-
             for (prediction in result.autocompletePredictions) {
                 predictionsList.add(prediction)
-//                Log.i(TAG, prediction.)
-                Log.i(TAG, prediction.getPrimaryText(null).toString())
-                Log.i(TAG, prediction.getSecondaryText(null).toString())
             }
-            Log.d("PlacesApi", "Success getting predictions")
+            Log.d(TAG, "Success getting predictions")
 
         } catch (e: Exception) {
-            Log.d("PlacesApi", "Error getting predictions")
+            Log.d(TAG, "Error getting predictions")
         }
-        Log.d("PlacesApi", "Returning predictions")
 
         return predictionsList
     }

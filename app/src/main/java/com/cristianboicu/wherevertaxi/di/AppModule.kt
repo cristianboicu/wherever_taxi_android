@@ -11,7 +11,7 @@ import com.cristianboicu.wherevertaxi.data.remote.places.PlacesApi
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.data.repository.Repository
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
-import com.cristianboicu.wherevertaxi.utils.ProjectConstants.ROUTES_URL
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants.MAPS_URL
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.auth.FirebaseAuth
@@ -64,7 +64,7 @@ abstract class AppModule {
         @Provides
         fun provideRetrofit(): Retrofit {
             return Retrofit.Builder()
-                .baseUrl(ROUTES_URL)
+                .baseUrl(MAPS_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }

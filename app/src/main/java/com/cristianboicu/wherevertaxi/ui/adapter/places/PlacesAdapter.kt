@@ -31,6 +31,7 @@ class PlaceViewHolder private constructor(private val binding: ItemPlaceBinding)
     ) {
         binding.placePrimary = item.getPrimaryText(null).toString()
         binding.placeSecondary = item.getSecondaryText(null).toString()
+        binding.placeId = item.placeId
         binding.clickListener = clickListener
         binding.executePendingBindings()
     }
@@ -61,5 +62,5 @@ class PlaceDiffCallback : DiffUtil.ItemCallback<AutocompletePrediction>() {
 }
 
 class PlacesListener(val clickListener: (placeId: String) -> Unit) {
-    fun onClick(place: AutocompletePrediction) = clickListener(place.placeId)
+    fun onClick(placeId: String) = clickListener(placeId)
 }

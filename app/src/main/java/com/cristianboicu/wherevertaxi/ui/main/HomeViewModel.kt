@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.remote.ApiService
 import com.cristianboicu.wherevertaxi.data.remote.places.IPlacesApi
@@ -38,13 +39,46 @@ class HomeViewModel @Inject constructor(
     private val _placesPredictions = MutableLiveData<List<AutocompletePrediction>>()
     val placesPredictions = _placesPredictions
 
-    val destination = MutableLiveData<String>()
-
     fun getPlacesPrediction(query: String) {
         viewModelScope.launch {
             placesPredictions.value = placesApi.getPredictions(query)
         }
     }
+    //TODO: REMOVE KEY
+
+    fun onPlaceSelected(placeId: String) {
+        apiService.getGeocoding(placeId, "API_KEY")
+            .enqueue(object : Callback<GeocodingResponse> {
+                override fun onResponse(
+                    call: Call<GeocodingResponse>,
+                    response: Response<GeocodingResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            if (it.results.isNotEmpty()) {
+                                Log.d("HomeViewModel", it.results[0].formattedAddress)
+                                Log.d("HomeViewModel", it.results[0].placeId)
+                                Log.d("HomeViewModel",
+                                    it.results[0].geometry.location.lat.toString())
+                                Log.d("HomeViewModel",
+                                    it.results[0].geometry.location.lng.toString())
+                                destination.value = LatLng(it.results[0].geometry.location.lat,
+                                    it.results[0].geometry.location.lng)
+
+                            }
+                        }
+                    }
+                    requestCurrentLocation()
+                    Log.d("HomeViewModel", "Success geocoding")
+                }
+
+                override fun onFailure(call: Call<GeocodingResponse>, t: Throwable) {
+                    Log.d("HomeViewModel", "Error geocoding")
+                }
+            })
+    }
+
+    val destination = MutableLiveData<LatLng>()
 
 
     fun requestCurrentLocation() {
@@ -52,15 +86,16 @@ class HomeViewModel @Inject constructor(
         Log.d("HomeViewModel", destination.value.toString())
     }
 
-    private val destinations = mutableListOf(LatLng(45.059854, 25.013080),
-        LatLng(46.659854, 25.613080),
-        LatLng(45.659854, 24.813080))
+//    private val destinations = mutableListOf(LatLng(45.059854, 25.013080),
+//        LatLng(46.659854, 25.613080),
+//        LatLng(45.659854, 24.813080))
 
     fun routeSelected(origin: LatLng) {
 //        val origin: LatLng = LatLng(45.659854, 25.613080)
-        val v = destination.value?.split(',')
-        val destination: LatLng = destinations.removeAt(destinations.size - 1)
-        requestRoutePath(origin, destination)
+//        val v = destination.value?.split(',')
+        destination.value?.let {
+            requestRoutePath(origin, it)
+        }
     }
 
     private fun requestRoutePath(origin: LatLng, destination: LatLng) {

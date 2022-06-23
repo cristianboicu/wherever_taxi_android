@@ -6,9 +6,11 @@
     <data>
 
         <variable
+            name="placeId"
+            type="String" />
+        <variable
             name="place_primary"
             type="String" />
-
         <variable
             name="place_secondary"
             type="String" />
@@ -23,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/small_value"
+        android:onClick="@{() -> clickListener.onClick(placeId)}"
         android:orientation="vertical">
 
         <TextView

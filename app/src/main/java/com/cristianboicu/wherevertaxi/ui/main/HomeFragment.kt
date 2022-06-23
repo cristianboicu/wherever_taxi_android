@@ -83,7 +83,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         setUpObserver()
 
         adapter = PlacesAdapter(PlacesListener {
-//            viewModel.on(it)
+            viewModel.onPlaceSelected(it)
         })
 
         binding.bottomSheet.rvAutocomplete.adapter = adapter

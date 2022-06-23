@@ -12,10 +12,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_sheet_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="700dp"
         android:background="@drawable/shape_rounded_dialog"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="100dp"
+        app:behavior_peekHeight="150dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <LinearLayout
@@ -39,8 +39,7 @@
                 android:hint="@string/where_to"
                 android:imeOptions="actionDone"
                 android:inputType="text"
-                android:maxLines="1"
-                android:text="@={viewModel.destination}" />
+                android:maxLines="1" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_go"
