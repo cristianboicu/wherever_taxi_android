@@ -4,20 +4,27 @@ import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.remote.ApiService
+import com.cristianboicu.wherevertaxi.data.remote.places.IPlacesApi
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val apiService: ApiService) : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val apiService: ApiService,
+    private val placesApi: IPlacesApi,
+) : ViewModel() {
 
     private val _drawMarkers = MutableLiveData<List<MarkerOptions>>()
     val drawMarkers = _drawMarkers
@@ -28,7 +35,17 @@ class HomeViewModel @Inject constructor(private val apiService: ApiService) : Vi
     private val _requestCurrentLocation = MutableLiveData<Unit>()
     val requestCurrentLocation = _requestCurrentLocation
 
+    private val _placesPredictions = MutableLiveData<List<AutocompletePrediction>>()
+    val placesPredictions = _placesPredictions
+
     val destination = MutableLiveData<String>()
+
+    fun getPlacesPrediction(query: String) {
+        viewModelScope.launch {
+            placesPredictions.value = placesApi.getPredictions(query)
+        }
+    }
+
 
     fun requestCurrentLocation() {
         _requestCurrentLocation.value = Unit
@@ -51,15 +68,17 @@ class HomeViewModel @Inject constructor(private val apiService: ApiService) : Vi
         val fromOrigin = origin.latitude.toString() + "," + origin.longitude.toString()
         val toDestination = destination.latitude.toString() + "," + destination.longitude.toString()
 
+        //TODO: REMOVE KEY
+
         apiService.getDirection(fromOrigin,
             toDestination,
-            "AIzaSyBoEFEOgq0tzccIxD91HN0zKBbvRhz994s")
+            "API_KEY")
             .enqueue(object : Callback<DirectionResponses> {
                 override fun onResponse(
                     call: Call<DirectionResponses>,
                     response: Response<DirectionResponses>,
                 ) {
-                    Log.e("HomeViewModel", "ebananans")
+                    Log.d("HomeViewModel", "ebananans")
                     drawPolyline(response)
                     generateMarkers(origin, destination)
                 }

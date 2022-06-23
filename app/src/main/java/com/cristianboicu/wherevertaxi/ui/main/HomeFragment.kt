@@ -23,11 +23,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
-import com.cristianboicu.wherevertaxi.utils.EventObserver
+import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesAdapter
+import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesListener
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -43,12 +42,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     private lateinit var map: GoogleMap
     private lateinit var drawer: DrawerLayout
-
+    private val TAG = "HomeFragment"
     private lateinit var mBottomSheetLayout: ConstraintLayout
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
     lateinit var viewModel: HomeViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mCurrentLocation: Location
+    private lateinit var adapter: PlacesAdapter
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
@@ -82,6 +82,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         setUpObserver()
 
+        adapter = PlacesAdapter(PlacesListener {
+//            viewModel.on(it)
+        })
+
+        binding.bottomSheet.rvAutocomplete.adapter = adapter
 
         return binding.root
     }
@@ -102,7 +107,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             map.addPolyline(it)
         }
 
-        viewModel.requestCurrentLocation.observe(viewLifecycleOwner){
+        viewModel.placesPredictions.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+            for (item in it) {
+                Log.d("Prediction: ", item.placeId)
+            }
+        }
+
+        viewModel.requestCurrentLocation.observe(viewLifecycleOwner) {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     location?.let {
@@ -124,33 +136,32 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
         mMapFragment?.getMapAsync(this)
 
+        configureShowMyLocationButton(mMapFragment)
+
+        mBottomSheetLayout = binding.bottomSheet.bottomSheetLayout
+        sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
+
+        binding.bottomSheet.etWhereTo.setOnClickListener {
+            sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            sheetBehavior.setDraggable(true)
+        }
+        binding.btnNavigationDrawer.setOnClickListener {
+            openDrawer()
+        }
+    }
+
+    private fun configureShowMyLocationButton(mMapFragment: SupportMapFragment?) {
         val locationButton = (mMapFragment!!.requireView().findViewById<View>("1".toInt())
             .parent as View).findViewById<View>("2".toInt())
         val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
         rlp.setMargins(0, 0, 30, 280)
-
-        mBottomSheetLayout = binding.bottomSheet.bottomSheetLayout
-        sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
-
-        binding.btnNavigationDrawer.setOnClickListener {
-            openDrawer()
-        }
-
     }
 
     private fun openDrawer() {
         activity?.let {
             drawer.openDrawer(GravityCompat.START)
-        }
-    }
-
-    fun createLocationRequest() {
-        val locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = Priority.PRIORITY_HIGH_ACCURACY
         }
     }
 
@@ -182,11 +193,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         )
         activityResultLauncher.launch(appPerms)
 
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-//        HomeFragment.onSaveInstanceState(outState)
     }
 
     /**

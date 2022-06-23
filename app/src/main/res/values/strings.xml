@@ -13,4 +13,5 @@
     <string name="no_email_provided">No email provided</string>
     <string name="where_to">Where to?</string>
     <string name="go">Go</string>
+    <string name="api_key">API_KEY</string>
 </resources>

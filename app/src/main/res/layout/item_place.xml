@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="place_primary"
+            type="String" />
+
+        <variable
+            name="place_secondary"
+            type="String" />
+
+        <variable
+            name="clickListener"
+            type="com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesListener" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/small_value"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_place_primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/medium_value"
+            android:text="@{place_primary}"
+            android:textSize="@dimen/normal_text_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Strada parcului 2" />
+
+        <TextView
+            android:id="@+id/tv_place_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/medium_value"
+            android:text="@{place_secondary}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Strada parcului 2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/small_value"
+            android:background="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/tv_place_secondary" />
+
+    </LinearLayout>
+</layout>

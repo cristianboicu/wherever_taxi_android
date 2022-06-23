@@ -19,6 +19,7 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <LinearLayout
+            android:id="@+id/search_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/small_value"
@@ -34,20 +35,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:text="@={viewModel.destination}"
-                android:inputType="text"
-                android:imeOptions="actionDone"
-                android:maxLines="1"
                 android:drawableStart="@drawable/ic_search"
-                android:hint="@string/where_to" />
+                android:hint="@string/where_to"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1"
+                android:text="@={viewModel.destination}" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_go"
-                android:onClick="@{() -> viewModel.requestCurrentLocation()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
                 android:text="@string/go" />
         </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_autocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_marginHorizontal="@dimen/small_value"
+            android:layout_marginTop="@dimen/medium_value"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_layout" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
