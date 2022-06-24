@@ -1,6 +1,7 @@
 package com.cristianboicu.wherevertaxi.data.remote
 
 import android.util.Log
+import com.cristianboicu.wherevertaxi.data.model.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
@@ -54,5 +55,9 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun getPredictions(query: String): MutableList<AutocompletePrediction> {
         return cloudServiceApi.getPredictions(query)
+    }
+
+    override suspend fun getDrivers(): List<Driver?>?{
+        return firebaseApi.getDrivers()
     }
 }

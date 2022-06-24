@@ -5,10 +5,14 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Interpolator
+import android.view.animation.LinearInterpolator
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -32,6 +36,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -98,7 +103,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                 map.addMarker(marker)
             }
             if (it.isNotEmpty()) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(it[it.size - 1].position, 11.6f))
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(it[it.size - 1].position, 15f))
             }
         }
 

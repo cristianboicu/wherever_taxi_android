@@ -1,5 +1,6 @@
 package com.cristianboicu.wherevertaxi.data.remote
 
+import com.cristianboicu.wherevertaxi.data.model.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
@@ -25,4 +26,6 @@ interface IRemoteDataSource {
     ): GeocodingResponse?
 
     suspend fun getPredictions(query: String): MutableList<AutocompletePrediction>
+
+    suspend fun getDrivers(): List<Driver?>?
 }

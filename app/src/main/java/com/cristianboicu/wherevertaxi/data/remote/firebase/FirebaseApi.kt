@@ -1,6 +1,7 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
 import android.util.Log
+import com.cristianboicu.wherevertaxi.data.model.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
 import com.google.firebase.auth.FirebaseAuth
@@ -32,5 +33,21 @@ class FirebaseApi
             null
         }
 
+    }
+
+    override suspend fun getDrivers(): List<Driver?>? {
+        return try {
+            val listResult = mutableListOf<Driver?>()
+            val res =
+                database.child(ProjectConstants.DRIVERS_PATH).get().await()
+            for (driver in res.children){
+                listResult.add(driver.getValue(Driver::class.java))
+            }
+            Log.d("RemoteDataSource", "Got value $listResult")
+            listResult
+        } catch (e: Exception){
+            Log.d("RemoteDataSource", "Got drivers error ${e.message}")
+            null
+        }
     }
 }

@@ -25,5 +25,5 @@ data class GeoLocation(
     @SerializedName("lat")
     var lat: Double,
     @SerializedName("lng")
-    var lng: Double,
+    var lng: Double
 )
