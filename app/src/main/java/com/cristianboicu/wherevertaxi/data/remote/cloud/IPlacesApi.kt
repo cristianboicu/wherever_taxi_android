@@ -1,4 +1,4 @@
-package com.cristianboicu.wherevertaxi.data.remote.places
+package com.cristianboicu.wherevertaxi.data.remote.cloud
 
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 

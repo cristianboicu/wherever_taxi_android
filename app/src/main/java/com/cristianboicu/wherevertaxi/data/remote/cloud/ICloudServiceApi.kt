@@ -1,28 +1,21 @@
-package com.cristianboicu.wherevertaxi.data.remote
+package com.cristianboicu.wherevertaxi.data.remote.cloud
 
-import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.google.android.libraries.places.api.model.AutocompletePrediction
-import com.google.firebase.auth.FirebaseUser
 import retrofit2.Response
 
-interface IRemoteDataSource {
-
-    fun getLoggedUserId(): FirebaseUser?
-
-    suspend fun getLoggedUserData(currentUser: FirebaseUser): User?
-
+interface ICloudServiceApi {
     suspend fun getDirection(
         origin: String,
         destination: String,
         apiKey: String,
-    ): DirectionResponses?
+    ): Response<DirectionResponses>
 
     suspend fun getGeocoding(
         place_id: String,
         apiKey: String,
-    ): GeocodingResponse?
+    ): Response<GeocodingResponse>
 
     suspend fun getPredictions(query: String): MutableList<AutocompletePrediction>
 }

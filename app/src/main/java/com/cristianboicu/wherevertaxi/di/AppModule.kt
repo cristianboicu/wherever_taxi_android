@@ -3,11 +3,11 @@ package com.cristianboicu.wherevertaxi.di
 import android.content.Context
 import android.util.Log
 import com.cristianboicu.wherevertaxi.R
-import com.cristianboicu.wherevertaxi.data.remote.ApiService
 import com.cristianboicu.wherevertaxi.data.remote.IRemoteDataSource
 import com.cristianboicu.wherevertaxi.data.remote.RemoteDataSource
-import com.cristianboicu.wherevertaxi.data.remote.places.IPlacesApi
-import com.cristianboicu.wherevertaxi.data.remote.places.PlacesApi
+import com.cristianboicu.wherevertaxi.data.remote.cloud.*
+import com.cristianboicu.wherevertaxi.data.remote.firebase.FirebaseApi
+import com.cristianboicu.wherevertaxi.data.remote.firebase.IFirebaseApi
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.data.repository.Repository
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
@@ -35,6 +35,16 @@ abstract class AppModule {
     abstract fun bindRemoteDataSource(
         remoteDataSource: RemoteDataSource,
     ): IRemoteDataSource
+
+    @Binds
+    abstract fun bindFirebaseApi(
+        firebaseApi: FirebaseApi,
+    ): IFirebaseApi
+
+    @Binds
+    abstract fun bindCloudServiceApi(
+        cloudServiceApi: CloudServiceApi,
+    ): ICloudServiceApi
 
     @Binds
     abstract fun bindPlacesApi(
@@ -80,14 +90,28 @@ abstract class AppModule {
         }
 
         @Provides
+        @Singleton
+        fun provideFirebaseApi(
+            firebaseAuth: FirebaseAuth,
+            database: DatabaseReference,
+        ): FirebaseApi {
+            return FirebaseApi(firebaseAuth, database)
+        }
+
+        @Provides
         fun provideFirebaseDatabaseInstance(): DatabaseReference {
             return Firebase.database(ProjectConstants.DATABASE_URL).reference
         }
 
+        @Provides
+        fun provideCloudServiceApi(apiService: ApiService, placesApi: PlacesApi): CloudServiceApi {
+            return CloudServiceApi(apiService, placesApi)
+        }
+
         @Singleton
         @Provides
-        fun provideRemoteDataSource(firebaseAuth: FirebaseAuth, database: DatabaseReference) =
-            RemoteDataSource(firebaseAuth, database)
+        fun provideRemoteDataSource(firebaseApi: FirebaseApi, cloudServiceApi: CloudServiceApi) =
+            RemoteDataSource(firebaseApi, cloudServiceApi)
 
         @Singleton
         @Provides

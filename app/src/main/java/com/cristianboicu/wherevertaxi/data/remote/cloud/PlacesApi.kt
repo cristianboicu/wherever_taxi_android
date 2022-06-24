@@ -1,6 +1,7 @@
-package com.cristianboicu.wherevertaxi.data.remote.places
+package com.cristianboicu.wherevertaxi.data.remote.cloud
 
 import android.util.Log
+import com.cristianboicu.wherevertaxi.data.remote.cloud.IPlacesApi
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -18,7 +19,7 @@ class PlacesApi @Inject constructor(private val placesClient: PlacesClient) : IP
 
         val bounds = RectangularBounds.newInstance(
             LatLng(43.830194, 30.072558),
-            LatLng(48.127130, 20.331747)  //dummy lat/lng
+            LatLng(48.127130, 20.331747)
         )
 
         val request =
