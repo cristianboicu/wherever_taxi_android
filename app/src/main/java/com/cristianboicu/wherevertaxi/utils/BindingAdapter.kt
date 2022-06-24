@@ -9,11 +9,17 @@ import com.cristianboicu.wherevertaxi.data.model.User
 @BindingAdapter("userName")
 fun TextView.setUserName(user: User?) {
     user?.let {
-        text = if (!it.fname.isNullOrEmpty() || !it.sname.isNullOrEmpty()) {
-            "${it.fname} ${it.sname}"
-        } else {
-            "Not provided"
+        var temp = ""
+        if (!it.fname.isNullOrEmpty()) {
+            temp += "${it.fname}"
         }
+        if (!it.sname.isNullOrEmpty()) {
+            temp += " ${it.sname}"
+        }
+        if (it.sname.isNullOrEmpty() && it.fname.isNullOrEmpty()) {
+            temp = "Not provided"
+        }
+        text = temp
     }
 }
 

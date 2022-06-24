@@ -9,6 +9,7 @@ import android.view.animation.LinearInterpolator
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import java.util.regex.Pattern
 
 object Util {
     fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
@@ -53,6 +54,17 @@ object Util {
                 }
             }
         })
+    }
+
+    fun isValidEmail(email: CharSequence): Boolean {
+        var isValid = true
+        val expression = "^[\\w.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"
+        val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
+        val matcher = pattern.matcher(email)
+        if (!matcher.matches()) {
+            isValid = false
+        }
+        return isValid
     }
 }
 

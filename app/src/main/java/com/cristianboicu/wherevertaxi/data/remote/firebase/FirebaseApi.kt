@@ -21,7 +21,6 @@ class FirebaseApi
     }
 
     override suspend fun getCurrentUserData(currentUser: FirebaseUser): User? {
-
         return try {
             val res =
                 database.child(ProjectConstants.USERS_PATH).child(currentUser.uid).get().await()
@@ -32,7 +31,19 @@ class FirebaseApi
             Log.d("RemoteDataSource", "Error getting data ${e.message}")
             null
         }
+    }
 
+    override suspend fun updateUserData(uid: String, updatedUser: User) {
+        try {
+            database.child(ProjectConstants.USERS_PATH).child(uid).child("fname")
+                .setValue(updatedUser.fname).await()
+            database.child(ProjectConstants.USERS_PATH).child(uid).child("sname")
+                .setValue(updatedUser.sname).await()
+            database.child(ProjectConstants.USERS_PATH).child(uid).child("email")
+                .setValue(updatedUser.email).await()
+        } catch (e: Exception) {
+
+        }
     }
 
     override suspend fun getDrivers(): List<Driver?>? {
@@ -40,14 +51,23 @@ class FirebaseApi
             val listResult = mutableListOf<Driver?>()
             val res =
                 database.child(ProjectConstants.DRIVERS_PATH).get().await()
-            for (driver in res.children){
+            for (driver in res.children) {
                 listResult.add(driver.getValue(Driver::class.java))
             }
             Log.d("RemoteDataSource", "Got value $listResult")
             listResult
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Log.d("RemoteDataSource", "Got drivers error ${e.message}")
             null
+        }
+    }
+
+    override fun logOutUser(): Boolean {
+        return try {
+            firebaseAuth.signOut()
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 }

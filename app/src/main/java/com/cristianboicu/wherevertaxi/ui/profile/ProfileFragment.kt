@@ -1,6 +1,7 @@
 package com.cristianboicu.wherevertaxi.ui.profile
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -15,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentProfileBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.cristianboicu.wherevertaxi.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -43,6 +44,16 @@ class ProfileFragment : Fragment() {
             }
         }
 
+        viewModel.logOutUser.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                restartApp(requireActivity())
+            }
+        })
+
+        viewModel.launchEditUserFragment.observe(viewLifecycleOwner, EventObserver {
+            navigateEditUser()
+        })
+
         return binding.root
     }
 
@@ -50,15 +61,10 @@ class ProfileFragment : Fragment() {
         binding.imageButton.setOnClickListener {
             navigateBackHome()
         }
-        binding.profileLogOut.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            restartApp()
-        }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun restartApp() {
-        val activity = requireActivity()
+    private fun restartApp(activity: Activity) {
 
         val am = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am[AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 500] =
@@ -74,6 +80,12 @@ class ProfileFragment : Fragment() {
     private fun navigateBackHome() {
         this.findNavController().navigate(
             ProfileFragmentDirections.actionProfileFragmentToHomeFragment()
+        )
+    }
+
+    private fun navigateEditUser() {
+        this.findNavController().navigate(
+            ProfileFragmentDirections.actionProfileFragmentToEditUserDataFragment()
         )
     }
 }

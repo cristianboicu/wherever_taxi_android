@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.cristianboicu.wherevertaxi.ui.profile.ProfileViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/small_value"
+        android:paddingVertical="@dimen/very_big_value"
+        tools:context=".ui.profile.EditUserDataFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:onClick="@{()->viewModel.navigateBackToProfile()}"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/big_value"
+                android:layout_weight="20"
+                android:text="@string/edit_profile"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:onClick="@{()->viewModel.saveModifiedUser(etFname.getText().toString(),etSname.getText().toString(),etEmail.getText().toString())}"
+                android:src="@drawable/ic_done" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_fname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_value"
+            android:hint="@string/first_name"
+            android:text="@{viewModel.loadedUser.fname}" />
+
+        <EditText
+            android:id="@+id/et_sname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/second_name"
+            android:text="@{viewModel.loadedUser.sname}" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="@string/phone_number"
+            android:text="@{viewModel.loadedUser.phone}" />
+
+        <EditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:inputType="textEmailAddress"
+            android:layout_height="wrap_content"
+            android:hint="@string/email"
+            android:text="@{viewModel.loadedUser.email}" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_value"
+            android:text="@string/your_phone_number_can_t_be_changed"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+</layout>

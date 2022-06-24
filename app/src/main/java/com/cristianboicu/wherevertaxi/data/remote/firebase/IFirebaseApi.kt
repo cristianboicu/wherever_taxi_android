@@ -9,5 +9,9 @@ interface IFirebaseApi {
 
     suspend fun getCurrentUserData(currentUser: FirebaseUser): User?
 
+    suspend fun updateUserData(uid: String, updatedUser: User)
+
     suspend fun getDrivers(): List<Driver?>?
+
+    fun logOutUser(): Boolean
 }

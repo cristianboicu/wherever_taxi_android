@@ -27,6 +27,14 @@ class RemoteDataSource @Inject constructor(
         return res
     }
 
+    override fun logOutUser(): Boolean {
+        return firebaseApi.logOutUser()
+    }
+
+    override suspend fun updateUserData(uid: String, updatedUser: User) {
+        return firebaseApi.updateUserData(uid, updatedUser)
+    }
+
     override suspend fun getDirection(
         origin: String,
         destination: String,

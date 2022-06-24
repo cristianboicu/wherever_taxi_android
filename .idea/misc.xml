@@ -13,6 +13,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.27247451343836887" />
         <entry key="app/src/main/res/layout/bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/btn_sign_in_with.xml" value="0.30512820512820515" />
+        <entry key="app/src/main/res/layout/fragment_edit_user_data.xml" value="0.2953125" />
         <entry key="app/src/main/res/layout/fragment_enter_verification_code.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_log_in.xml" value="0.25" />
