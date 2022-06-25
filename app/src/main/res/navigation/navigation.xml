@@ -31,7 +31,8 @@
         android:label="ProfileFragment" >
         <action
             android:id="@+id/action_profileFragment_to_homeFragment"
-            app:popUpTo="@id/homeFragment" />
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_profileFragment_to_editUserDataFragment"
             app:destination="@id/editUserDataFragment" />

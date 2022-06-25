@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.remote.IRemoteDataSource
+import com.cristianboicu.wherevertaxi.utils.Event
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.API_KEY
 import com.cristianboicu.wherevertaxi.utils.Util.getResizedBitmap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -34,10 +35,10 @@ class HomeViewModel @Inject constructor(
     private val _drawMarkers = MutableLiveData<List<MarkerOptions>>()
     val drawMarkers = _drawMarkers
 
-    private val _drawPolyLine = MutableLiveData<PolylineOptions>()
+    private val _drawPolyLine = MutableLiveData<Event<PolylineOptions>>()
     val drawPolyLine = _drawPolyLine
 
-    private val _requestCurrentLocation = MutableLiveData<Unit>()
+    private val _requestCurrentLocation = MutableLiveData<Event<Unit>>()
     val requestCurrentLocation = _requestCurrentLocation
 
     private val _rideState = MutableLiveData<RideState>()
@@ -50,6 +51,8 @@ class HomeViewModel @Inject constructor(
 
     init {
         showDrivers()
+        Log.d("HomeFragment Prediction: ", "init")
+
         _rideState.value = RideState.SEARCH
     }
 
@@ -74,7 +77,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun requestCurrentLocation() {
-        _requestCurrentLocation.value = Unit
+        _requestCurrentLocation.value = Event(Unit)
         Log.d("HomeViewModel", destination.value.toString())
     }
 
@@ -100,17 +103,14 @@ class HomeViewModel @Inject constructor(
         val shape: String? = response?.routes?.get(0)?.overviewPolyline?.points
 
         val decodedShape = PolyUtil.decode(shape)
-        for (i in decodedShape){
-            Log.d("HomeViewModel", "$i \n")
-        }
-//        for (i in response?.routes?.){
-//
+//        for (i in decodedShape){
+//            Log.d("HomeViewModel", "$i \n")
 //        }
         val polyline = PolylineOptions()
             .addAll(decodedShape)
             .width(8f)
             .color(Color.BLUE)
-        _drawPolyLine.value = polyline
+        _drawPolyLine.value = Event(polyline)
     }
 
     private fun generateMarkers(markerList: List<LatLng>, isDriver: Boolean) {

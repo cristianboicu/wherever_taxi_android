@@ -2,6 +2,7 @@ package com.cristianboicu.wherevertaxi.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -25,6 +26,7 @@ import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesAdapter
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesListener
+import com.cristianboicu.wherevertaxi.utils.EventObserver
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -76,6 +78,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         setUpUi(binding, savedInstanceState)
+        Log.d("HomeFragment Prediction: ", "oncreate")
 
         binding.viewModel = viewModel
         binding.bottomSheet.viewModel = viewModel
@@ -91,6 +94,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d("HomeFragment Prediction: ", "onviewcreated")
+
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d("HomeFragment Prediction: ", "onattach")
+
+    }
     @SuppressLint("MissingPermission")
     private fun setUpObserver() {
         viewModel.drawMarkers.observe(viewLifecycleOwner) {
@@ -102,19 +116,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
-        viewModel.drawPolyLine.observe(viewLifecycleOwner) {
+        viewModel.drawPolyLine.observe(viewLifecycleOwner, EventObserver {
             map.clear()
             map.addPolyline(it)
-        }
+            Log.d("HomeFragment draw: ", "ploy")
+        })
 
-        viewModel.placesPredictions.observe(viewLifecycleOwner) {
+        viewModel.placesPredictions.observe(viewLifecycleOwner){
             adapter.submitList(it)
-            for (item in it) {
-                Log.d("Prediction: ", item.placeId)
-            }
+            Log.d("HomeFragment Prediction: ", "item.placeId")
         }
 
-        viewModel.requestCurrentLocation.observe(viewLifecycleOwner) {
+        viewModel.requestCurrentLocation.observe(viewLifecycleOwner, EventObserver {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     location?.let {
@@ -124,7 +137,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                             "${mCurrentLocation.latitude} , ${mCurrentLocation.longitude}")
                     }
                 }
-        }
+        })
     }
 
     override fun onResume() {
@@ -148,23 +161,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         binding.btnNavigationDrawer.setOnClickListener {
             openDrawer()
         }
+
         binding.bottomSheet.standardCar.layoutCarType.isSelected = true
         binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
 
         binding.bottomSheet.standardCar.layoutCarType.setOnClickListener {
             it.isSelected = true
             binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
-            Log.d("HomeFragment", "standard ${it.isSelected}")
-            Log.d("HomeFragment", "comfort ${ binding.bottomSheet.comfortCar.layoutCarType.isSelected}")
         }
         binding.bottomSheet.comfortCar.layoutCarType.setOnClickListener {
             it.isSelected = true
             binding.bottomSheet.standardCar.layoutCarType.isSelected = false
-            Log.d("HomeFragment", "comfort ${it.isSelected}")
-            Log.d("HomeFragment", "standard ${binding.bottomSheet.standardCar.layoutCarType.isSelected }")
-
         }
-
 
     }
 
