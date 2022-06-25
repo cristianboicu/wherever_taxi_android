@@ -1,9 +1,11 @@
 package com.cristianboicu.wherevertaxi.utils
 
 import android.annotation.SuppressLint
+import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.cristianboicu.wherevertaxi.data.model.User
+import com.cristianboicu.wherevertaxi.ui.main.RideState
 
 @SuppressLint("SetTextI18n")
 @BindingAdapter("userName")
@@ -38,5 +40,31 @@ fun TextView.setUserEmail(user: User?) {
         } else {
             "Not provided"
         }
+    }
+}
+
+@BindingAdapter("setCarsVisibility")
+fun View.setCarsVisibility(state: RideState) {
+    visibility = if (state == RideState.SELECT_CAR) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}
+
+@BindingAdapter("setSearchVisibility")
+fun View.setSearchVisibility(state: RideState) {
+    visibility = if (state == RideState.SEARCH) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}
+@BindingAdapter("setNavigationDrawerVisibility")
+fun View.setNavigationDrawerVisibility(state: RideState) {
+    visibility = if (state != RideState.SELECT_CAR) {
+        View.VISIBLE
+    } else {
+        View.GONE
     }
 }

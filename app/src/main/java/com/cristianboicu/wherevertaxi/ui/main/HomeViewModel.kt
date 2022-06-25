@@ -1,5 +1,6 @@
 package com.cristianboicu.wherevertaxi.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -23,6 +24,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val remoteDataSource: IRemoteDataSource,
@@ -38,19 +40,24 @@ class HomeViewModel @Inject constructor(
     private val _requestCurrentLocation = MutableLiveData<Unit>()
     val requestCurrentLocation = _requestCurrentLocation
 
+    private val _rideState = MutableLiveData<RideState>()
+    val rideState = _rideState
+
     private val _placesPredictions = MutableLiveData<List<AutocompletePrediction>>()
     val placesPredictions = _placesPredictions
 
     private val destination = MutableLiveData<LatLng>()
 
-
     init {
         showDrivers()
+        _rideState.value = RideState.SEARCH
     }
 
     fun getPlacesPrediction(query: String) {
         viewModelScope.launch {
+            _rideState.value = RideState.LOADING
             placesPredictions.value = remoteDataSource.getPredictions(query)
+            _rideState.value = RideState.SEARCH
         }
     }
 
@@ -83,6 +90,7 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             val response = remoteDataSource.getDirection(fromOrigin, toDestination, API_KEY)
+            _rideState.value = RideState.SELECT_CAR
             drawPolyline(response)
             generateMarkers(listOf(destination), false)
         }
@@ -91,8 +99,15 @@ class HomeViewModel @Inject constructor(
     private fun drawPolyline(response: DirectionResponses?) {
         val shape: String? = response?.routes?.get(0)?.overviewPolyline?.points
 
+        val decodedShape = PolyUtil.decode(shape)
+        for (i in decodedShape){
+            Log.d("HomeViewModel", "$i \n")
+        }
+//        for (i in response?.routes?.){
+//
+//        }
         val polyline = PolylineOptions()
-            .addAll(PolyUtil.decode(shape))
+            .addAll(decodedShape)
             .width(8f)
             .color(Color.BLUE)
         _drawPolyLine.value = polyline
@@ -142,4 +157,16 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun goBackToSelectDestination(){
+        _rideState.value = RideState.SEARCH
+    }
+}
+
+enum class RideState{
+    SEARCH,
+    LOADING,
+    SELECT_CAR,
+    ONGOING,
+    FINISH
 }

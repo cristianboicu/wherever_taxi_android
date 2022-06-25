@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-    <variable
-        name="viewModel"
-        type="com.cristianboicu.wherevertaxi.ui.main.HomeViewModel" />
+
+        <variable
+            name="viewModel"
+            type="com.cristianboicu.wherevertaxi.ui.main.HomeViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -28,11 +29,25 @@
 
         <ImageButton
             android:id="@+id/btn_navigation_drawer"
+            setNavigationDrawerVisibility="@{viewModel.rideState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/small_value"
             android:layout_marginTop="@dimen/very_big_value"
             android:src="@drawable/ic_menu"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_back_to_search"
+            setCarsVisibility="@{viewModel.rideState}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_value"
+            android:layout_marginTop="@dimen/very_big_value"
+            android:onClick="@{()->viewModel.goBackToSelectDestination()}"
+            android:src="@drawable/ic_back"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

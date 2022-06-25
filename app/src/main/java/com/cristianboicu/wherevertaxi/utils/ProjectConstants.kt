@@ -6,5 +6,5 @@ object ProjectConstants {
     const val DRIVERS_PATH = "drivers"
     const val MAPS_URL = "https://maps.googleapis.com/"
     //TODO: Remove key
-    const val API_KEY = "API_KEY"
+    const val API_KEY = ""
 }

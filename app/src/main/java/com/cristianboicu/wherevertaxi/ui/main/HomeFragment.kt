@@ -5,14 +5,10 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
-import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Interpolator
-import android.view.animation.LinearInterpolator
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -36,7 +32,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -153,6 +148,24 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         binding.btnNavigationDrawer.setOnClickListener {
             openDrawer()
         }
+        binding.bottomSheet.standardCar.layoutCarType.isSelected = true
+        binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
+
+        binding.bottomSheet.standardCar.layoutCarType.setOnClickListener {
+            it.isSelected = true
+            binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
+            Log.d("HomeFragment", "standard ${it.isSelected}")
+            Log.d("HomeFragment", "comfort ${ binding.bottomSheet.comfortCar.layoutCarType.isSelected}")
+        }
+        binding.bottomSheet.comfortCar.layoutCarType.setOnClickListener {
+            it.isSelected = true
+            binding.bottomSheet.standardCar.layoutCarType.isSelected = false
+            Log.d("HomeFragment", "comfort ${it.isSelected}")
+            Log.d("HomeFragment", "standard ${binding.bottomSheet.standardCar.layoutCarType.isSelected }")
+
+        }
+
+
     }
 
     private fun configureShowMyLocationButton(mMapFragment: SupportMapFragment?) {
@@ -161,7 +174,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-        rlp.setMargins(0, 0, 30, 280)
+        rlp.setMargins(0, 0, 30, 480)
     }
 
     private fun openDrawer() {

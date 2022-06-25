@@ -18,48 +18,100 @@
         app:behavior_peekHeight="150dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <LinearLayout
-            android:id="@+id/search_layout"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_destination"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/small_value"
-            android:layout_marginTop="@dimen/medium_value"
-            android:gravity="center"
-            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            setSearchVisibility="@{viewModel.rideState}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <EditText
-                android:id="@+id/et_where_to"
+            <LinearLayout
+                android:id="@+id/search_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:drawableStart="@drawable/ic_search"
-                android:hint="@string/where_to"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:maxLines="1" />
+                android:layout_marginHorizontal="@dimen/small_value"
+                android:layout_marginTop="@dimen/medium_value"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_go"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
-                android:text="@string/go" />
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/et_where_to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:drawableStart="@drawable/ic_search"
+                    android:hint="@string/where_to"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_autocomplete"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_go"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
+                    android:text="@string/go" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_autocomplete"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="@dimen/small_value"
+                android:layout_marginTop="@dimen/medium_value"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/search_layout" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_select_car"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:layout_marginHorizontal="@dimen/small_value"
+            android:layout_height="match_parent"
+            setCarsVisibility="@{viewModel.rideState}"
             android:layout_marginTop="@dimen/medium_value"
+            android:visibility="gone"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_layout" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <include
+                android:id="@+id/standard_car"
+                layout="@layout/item_car"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                android:id="@+id/comfort_car"
+                layout="@layout/item_car"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_value" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_select_car"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/small_value"
+                android:layout_marginTop="@dimen/medium_value"
+                android:background="@drawable/bg_rounded_corners"
+                android:backgroundTint="@color/secondaryColor"
+                android:paddingVertical="@dimen/medium_value"
+                android:text="@string/select_car"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

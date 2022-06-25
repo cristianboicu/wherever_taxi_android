@@ -12,11 +12,13 @@
     <string name="no_email_provided">No email provided</string>
     <string name="where_to">Where to?</string>
     <string name="go">Go</string>
-    <string name="api_key">API_KEY</string>
+    <string name="api_key"></string>
     <string name="edit_profile">Edit Profile</string>
     <string name="your_phone_number_can_t_be_changed">Your phone number can\'t be changed.</string>
     <string name="first_name">First Name</string>
     <string name="second_name">Second Name</string>
     <string name="phone_number">Phone Number</string>
     <string name="email">Email</string>
+    <string name="standard">Standard</string>
+    <string name="select_car">Select Car</string>
 </resources>
