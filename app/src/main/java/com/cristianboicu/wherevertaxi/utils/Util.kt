@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.regex.Pattern
 
 object Util {
@@ -40,5 +42,19 @@ object Util {
         }
         return isValid
     }
+
+    fun getCurrentDate(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        return sdf.format(Date())
+    }
+
+    fun getCurrentTime(): String {
+        val c = Calendar.getInstance()
+
+        val hour = c.get(Calendar.HOUR_OF_DAY)
+        val minute = c.get(Calendar.MINUTE)
+        return "$hour:$minute"
+    }
+
 }
 

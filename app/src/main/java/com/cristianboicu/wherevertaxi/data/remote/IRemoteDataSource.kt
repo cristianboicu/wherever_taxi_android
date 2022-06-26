@@ -3,6 +3,7 @@ package com.cristianboicu.wherevertaxi.data.remote
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.auth.FirebaseUser
@@ -34,4 +35,8 @@ interface IRemoteDataSource {
     suspend fun getPredictions(query: String): MutableList<AutocompletePrediction>
 
     suspend fun getAvailableDrivers(): List<Driver?>?
+
+    suspend fun postRideRequest(
+        rideRequest: RideRequest
+    )
 }

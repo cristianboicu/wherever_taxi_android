@@ -3,9 +3,9 @@ package com.cristianboicu.wherevertaxi.data.remote.firebase
 import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
-import com.cristianboicu.wherevertaxi.data.model.driver.DriverLocation
-import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants.RIDE_REQUEST_PATH
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -52,18 +52,16 @@ class FirebaseApi
 
     override suspend fun getAvailableDrivers(): List<Driver?>? {
         return try {
-            val listResult = mutableListOf<Driver?>()
-            val location = mutableListOf<DriverLocation?>()
+            val availableDrivers = mutableListOf<Driver?>()
             val res =
                 database.child(ProjectConstants.AVAILABLE_DRIVERS_PATH).get().await()
 
             for (driver in res.children) {
-                listResult.add(driver.getValue(Driver::class.java))
-//                Log.d(TAG, "id: ${driver.key}")
-//                location.add(driver.child("currentLocation").getValue(DriverLocation::class.java))
+                availableDrivers.add(driver.getValue(Driver::class.java))
             }
-            Log.d(TAG, "Got value $location")
-            listResult
+
+            Log.d(TAG, "Got value $availableDrivers")
+            availableDrivers
         } catch (e: Exception) {
             Log.d(TAG, "Got drivers error ${e.message}")
             null
@@ -80,6 +78,18 @@ class FirebaseApi
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    override suspend fun postRideRequest(
+        rideRequest: RideRequest,
+    ) {
+        try {
+            database.child(RIDE_REQUEST_PATH).child(rideRequest.uid)
+                .setValue(rideRequest.rideRequestData).await()
+            Log.d(TAG, "succes adding ride request")
+        } catch (e: Exception) {
+            Log.d(TAG, "error adding ride request ${e.message}")
         }
     }
 }

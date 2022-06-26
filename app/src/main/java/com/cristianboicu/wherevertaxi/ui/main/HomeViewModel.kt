@@ -8,11 +8,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
+import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequestData
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.databinding.ItemCarBinding
 import com.cristianboicu.wherevertaxi.utils.Event
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.API_KEY
 import com.cristianboicu.wherevertaxi.utils.Util.getBitmapFromSvg
+import com.cristianboicu.wherevertaxi.utils.Util.getCurrentDate
+import com.cristianboicu.wherevertaxi.utils.Util.getCurrentTime
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -99,7 +104,19 @@ class HomeViewModel @Inject constructor(
                 _driverToClientPath.value =
                     repository.getDirection(LatLng(driverLocation.lat!!, driverLocation.lng!!),
                         origin)
-                _rideState.value = RideState.SELECT_CAR
+//                _rideState.value = RideState.SELECT_CAR
+                val rideRequestData =
+                    RideRequestData(
+                        originLocation = GeoLocation(origin.latitude, origin.longitude),
+                        destinationLocation = GeoLocation(destination!!.latitude,
+                            destination.longitude),
+                        vehicleClass = vehicleClass,
+                        date = getCurrentDate(),
+                        time = getCurrentTime(),
+                        price = 15.8,
+                        payment = "Cash"
+                    )
+                repository.postRideRequest(RideRequest(uid!!, rideRequestData))
             }
         }
     }

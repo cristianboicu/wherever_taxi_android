@@ -4,6 +4,7 @@ import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.remote.cloud.ICloudServiceApi
 import com.cristianboicu.wherevertaxi.data.remote.firebase.IFirebaseApi
@@ -72,5 +73,9 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun getAvailableDrivers(): List<Driver?>?{
         return firebaseApi.getAvailableDrivers()
+    }
+
+    override suspend fun postRideRequest(rideRequest: RideRequest) {
+        return firebaseApi.postRideRequest(rideRequest)
     }
 }

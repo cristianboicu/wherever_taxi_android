@@ -3,6 +3,7 @@ package com.cristianboicu.wherevertaxi.data.repository
 import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.remote.IRemoteDataSource
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.API_KEY
 import com.google.android.gms.maps.model.LatLng
@@ -31,6 +32,10 @@ class Repository @Inject constructor(private val remoteDataSource: IRemoteDataSo
 
     override suspend fun updateUserData(uid: String, updatedUser: User) {
         return remoteDataSource.updateUserData(uid, updatedUser)
+    }
+
+    override suspend fun postRideRequest(rideRequest: RideRequest) {
+        return remoteDataSource.postRideRequest(rideRequest)
     }
 
     override fun logOutUser(): Boolean {

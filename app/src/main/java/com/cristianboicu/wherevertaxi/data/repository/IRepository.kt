@@ -2,6 +2,7 @@ package com.cristianboicu.wherevertaxi.data.repository
 
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.auth.FirebaseUser
@@ -29,4 +30,8 @@ interface IRepository {
     suspend fun listenAvailableDrivers(): DatabaseReference
 
     suspend fun updateUserData(uid: String, updatedUser: User)
+
+    suspend fun postRideRequest(
+        rideRequest: RideRequest
+    )
 }

@@ -1,7 +1,9 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
-import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
+import com.cristianboicu.wherevertaxi.data.model.driver.Driver
+import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 
@@ -17,4 +19,8 @@ interface IFirebaseApi {
     suspend fun listenAvailableDrivers(): DatabaseReference
 
     fun logOutUser(): Boolean
+
+    suspend fun postRideRequest(
+        rideRequest: RideRequest
+    )
 }
