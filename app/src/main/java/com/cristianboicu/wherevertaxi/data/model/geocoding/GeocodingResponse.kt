@@ -1,6 +1,7 @@
 package com.cristianboicu.wherevertaxi.data.model.geocoding
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class GeocodingResponse(
     @SerializedName("results")
@@ -25,5 +26,5 @@ data class GeoLocation(
     @SerializedName("lat")
     var lat: Double,
     @SerializedName("lng")
-    var lng: Double
+    var lng: Double,
 )

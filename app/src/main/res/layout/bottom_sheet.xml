@@ -12,17 +12,17 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_sheet_layout"
         android:layout_width="match_parent"
-        android:layout_height="700dp"
+        android:layout_height="600dp"
         android:background="@drawable/shape_rounded_dialog"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="150dp"
+        app:behavior_peekHeight="250dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_destination"
+            setSearchVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            setSearchVisibility="@{viewModel.rideState}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -42,22 +42,19 @@
 
                 <EditText
                     android:id="@+id/et_where_to"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:drawableStart="@drawable/ic_search"
                     android:hint="@string/where_to"
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
                     android:imeOptions="actionDone"
+                    android:background="@drawable/bg_where_to"
                     android:inputType="text"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:onTextChanged="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_go"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
-                    android:text="@string/go" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -75,12 +72,13 @@
 
         <LinearLayout
             android:id="@+id/layout_select_car"
+            setCarsVisibility="@{viewModel.rideState}"
+            setEnabledDisabledComfort="@{viewModel.availableDrivers}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            setCarsVisibility="@{viewModel.rideState}"
             android:layout_marginTop="@dimen/medium_value"
-            android:visibility="gone"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -107,6 +105,7 @@
                 android:layout_marginTop="@dimen/medium_value"
                 android:background="@drawable/bg_rounded_corners"
                 android:backgroundTint="@color/secondaryColor"
+                android:onClick="@{()->viewModel.onCarSelected(standardCar, comfortCar)}"
                 android:paddingVertical="@dimen/medium_value"
                 android:text="@string/select_car"
                 android:textAllCaps="false"

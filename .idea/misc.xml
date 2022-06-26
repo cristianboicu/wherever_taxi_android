@@ -4,12 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../.gradle/caches/transforms-3/a6da7d0a2fdbf2ee7cfeed42bd331203/transformed/material-1.6.0/res/layout/design_bottom_sheet_dialog.xml" value="0.30512820512820515" />
+        <entry key="app/src/main/res/drawable/bg_disabled_car.xml" value="0.1395" />
+        <entry key="app/src/main/res/drawable/bg_disabled_care.xml" value="0.1395" />
         <entry key="app/src/main/res/drawable/bg_item_car.xml" value="0.1395" />
         <entry key="app/src/main/res/drawable/bg_non_selected_car.xml" value="0.1395" />
         <entry key="app/src/main/res/drawable/bg_rounded_corners.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/bg_selected_car.xml" value="0.1395" />
         <entry key="app/src/main/res/drawable/bg_sign_in_btn.xml" value="0.169" />
         <entry key="app/src/main/res/drawable/bg_sign_in_btn_pressed.xml" value="0.114" />
+        <entry key="app/src/main/res/drawable/bg_where_to.xml" value="0.1395" />
         <entry key="app/src/main/res/drawable/rounded_corners_bg.xml" value="0.114" />
         <entry key="app/src/main/res/drawable/selector_sign_in_with.xml" value="0.1725" />
         <entry key="app/src/main/res/drawable/shape_rounded_dialog.xml" value="0.1" />

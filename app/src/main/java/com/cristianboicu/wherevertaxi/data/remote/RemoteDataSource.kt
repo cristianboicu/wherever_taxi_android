@@ -1,7 +1,7 @@
 package com.cristianboicu.wherevertaxi.data.remote
 
 import android.util.Log
-import com.cristianboicu.wherevertaxi.data.model.Driver
+import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
@@ -9,6 +9,7 @@ import com.cristianboicu.wherevertaxi.data.remote.cloud.ICloudServiceApi
 import com.cristianboicu.wherevertaxi.data.remote.firebase.IFirebaseApi
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
 import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(
@@ -25,6 +26,10 @@ class RemoteDataSource @Inject constructor(
         val res = firebaseApi.getCurrentUserData(currentUser)
         Log.d("RemoteDataSource", "Got value $res")
         return res
+    }
+
+    override suspend fun listenAvailableDrivers(): DatabaseReference {
+        return firebaseApi.listenAvailableDrivers()
     }
 
     override fun logOutUser(): Boolean {
@@ -65,7 +70,7 @@ class RemoteDataSource @Inject constructor(
         return cloudServiceApi.getPredictions(query)
     }
 
-    override suspend fun getDrivers(): List<Driver?>?{
-        return firebaseApi.getDrivers()
+    override suspend fun getAvailableDrivers(): List<Driver?>?{
+        return firebaseApi.getAvailableDrivers()
     }
 }

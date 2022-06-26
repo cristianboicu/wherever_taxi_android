@@ -1,10 +1,13 @@
 package com.cristianboicu.wherevertaxi.utils
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.User
+import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.ui.main.RideState
 
 @SuppressLint("SetTextI18n")
@@ -54,12 +57,13 @@ fun View.setCarsVisibility(state: RideState) {
 
 @BindingAdapter("setSearchVisibility")
 fun View.setSearchVisibility(state: RideState) {
-    visibility = if (state == RideState.SEARCH) {
+    visibility = if (state == RideState.SELECT_DESTINATION) {
         View.VISIBLE
     } else {
         View.GONE
     }
 }
+
 @BindingAdapter("setNavigationDrawerVisibility")
 fun View.setNavigationDrawerVisibility(state: RideState) {
     visibility = if (state != RideState.SELECT_CAR) {
@@ -67,4 +71,38 @@ fun View.setNavigationDrawerVisibility(state: RideState) {
     } else {
         View.GONE
     }
+}
+
+@BindingAdapter("setEnabledDisabledStandard")
+fun View.setEnabledDisabledStandard(availableDrivers: Map<String, AvailableDriver>) {
+    var available = false
+    for (item in availableDrivers) {
+        if (item.value.vehicleClass == "Standard") {
+            available = true
+        }
+    }
+    rootView.isEnabled = available
+}
+
+@BindingAdapter("setEnabledDisabledComfort")
+fun View.setEnabledDisabledComfort(availableDrivers: Map<String, AvailableDriver>?) {
+    val comfort = findViewById<View>(R.id.comfort_car)
+    val standard = findViewById<View>(R.id.standard_car)
+
+    var availableComfort = false
+    var availableStandard = false
+    if (availableDrivers != null) {
+        for (item in availableDrivers) {
+            Log.d("Binding", "${item.value.vehicleClass}")
+
+            if (item.value.vehicleClass == "Comfort") {
+                availableComfort = true
+            }
+            if (item.value.vehicleClass == "Standard") {
+                availableStandard = true
+            }
+        }
+    }
+    comfort.isEnabled = availableComfort
+    standard.isEnabled = availableStandard
 }

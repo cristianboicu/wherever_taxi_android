@@ -2,24 +2,25 @@ package com.cristianboicu.wherevertaxi.ui.main
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cristianboicu.wherevertaxi.R
-import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
-import com.cristianboicu.wherevertaxi.data.remote.IRemoteDataSource
+import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
+import com.cristianboicu.wherevertaxi.data.repository.IRepository
+import com.cristianboicu.wherevertaxi.databinding.ItemCarBinding
 import com.cristianboicu.wherevertaxi.utils.Event
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.API_KEY
-import com.cristianboicu.wherevertaxi.utils.Util.getResizedBitmap
+import com.cristianboicu.wherevertaxi.utils.Util.getBitmapFromSvg
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.model.AutocompletePrediction
-import com.google.maps.android.PolyUtil
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -28,15 +29,17 @@ import javax.inject.Inject
 @SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val remoteDataSource: IRemoteDataSource,
+    private val repository: IRepository,
     @ApplicationContext val context: Context,
 ) : ViewModel() {
 
-    private val _drawMarkers = MutableLiveData<List<MarkerOptions>>()
-    val drawMarkers = _drawMarkers
+    private val TAG = "HomeViewModel"
 
-    private val _drawPolyLine = MutableLiveData<Event<PolylineOptions>>()
-    val drawPolyLine = _drawPolyLine
+    private val _availableDriverMarkers = MutableLiveData<List<MarkerOptions>>()
+    val availableDriverMarkers = _availableDriverMarkers
+
+    private val _clearMap = MutableLiveData<Event<Unit>>()
+    val clearMap = _clearMap
 
     private val _requestCurrentLocation = MutableLiveData<Event<Unit>>()
     val requestCurrentLocation = _requestCurrentLocation
@@ -47,124 +50,139 @@ class HomeViewModel @Inject constructor(
     private val _placesPredictions = MutableLiveData<List<AutocompletePrediction>>()
     val placesPredictions = _placesPredictions
 
+    private val _availableDrivers = MutableLiveData<HashMap<String, AvailableDriver>?>()
+    val availableDrivers = _availableDrivers
+
+    private val _driverToClientPath = MutableLiveData<String>()
+    val driverToClientPath = _driverToClientPath
+
+    private val _clientToDestinationPath = MutableLiveData<String>()
+    val clientToDestinationPath = _clientToDestinationPath
+
     private val destination = MutableLiveData<LatLng>()
+    val origin = MutableLiveData<LatLng>()
+
+    private val userId = repository.getLoggedUserId()
 
     init {
-        showDrivers()
-        Log.d("HomeFragment Prediction: ", "init")
+        updateUserCurrentLocation()
+        listenAvailableDrivers()
+        _rideState.value = RideState.SELECT_DESTINATION
+    }
 
-        _rideState.value = RideState.SEARCH
+    fun onCarSelected(standardView: ItemCarBinding, comfortView: ItemCarBinding) {
+        val standardCar =
+            standardView.layoutCarType.isEnabled && standardView.layoutCarType.isSelected
+        val comfortCar =
+            comfortView.layoutCarType.isEnabled && comfortView.layoutCarType.isSelected
+        Log.d(TAG, "$standardCar $comfortCar")
+
+        var vehicleClass = "Standard"
+        if (comfortCar) {
+            vehicleClass = "Comfort"
+        }
+        requestRide(origin.value, destination.value, userId, vehicleClass)
+    }
+
+    private fun requestRide(
+        origin: LatLng?,
+        destination: LatLng?,
+        uid: String?,
+        vehicleClass: String,
+    ) {
+        //add request to db
+        val drivers = availableDrivers.value?.toList()
+        val driverLocation = drivers?.get(1)?.second?.currentLocation
+
+        if (driverLocation != null && origin != null) {
+            viewModelScope.launch {
+                _driverToClientPath.value =
+                    repository.getDirection(LatLng(driverLocation.lat!!, driverLocation.lng!!),
+                        origin)
+                _rideState.value = RideState.SELECT_CAR
+            }
+        }
+    }
+
+    fun onDestinationSelected(destinationId: String) {
+        viewModelScope.launch {
+            val destinationLatLng =
+                repository.getGeocoding(destinationId, API_KEY)
+
+            destinationLatLng?.let {
+                destination.value = LatLng(it.results[0].geometry.location.lat,
+                    it.results[0].geometry.location.lng)
+                updateUserCurrentLocation()
+
+                _clientToDestinationPath.value =
+                    repository.getDirection(origin.value!!,
+                        destination.value!!)
+
+                _rideState.value = RideState.SELECT_CAR
+            }
+        }
+    }
+
+    private fun listenAvailableDrivers() {
+        val availableDriversListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                _availableDrivers.value = dataSnapshot.getValue<HashMap<String, AvailableDriver>>()
+                Log.w(TAG, "data changed ${_availableDrivers.value}")
+
+                _availableDrivers.value?.let {
+                    val markerList = mutableListOf<LatLng>()
+                    for (item in it) {
+                        markerList.add(LatLng(item.value.currentLocation!!.lat!!,
+                            item.value.currentLocation!!.lng!!))
+                    }
+                    generateAvailableDriverMarkers(markerList)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+
+        viewModelScope.launch {
+            val res = repository.listenAvailableDrivers()
+            res.addValueEventListener(availableDriversListener)
+        }
+    }
+
+    private fun generateAvailableDriverMarkers(markerList: List<LatLng>) {
+        val res = mutableListOf<MarkerOptions>()
+        val resizedBitmapIcon = getBitmapFromSvg(context, R.drawable.car_model)
+
+        for (item in markerList) {
+            res.add(MarkerOptions()
+                .position(item)
+                .icon(resizedBitmapIcon?.let {
+                    BitmapDescriptorFactory.fromBitmap(it)
+                })
+            )
+        }
+        _availableDriverMarkers.value = res
     }
 
     fun getPlacesPrediction(query: String) {
         viewModelScope.launch {
-            _rideState.value = RideState.LOADING
-            placesPredictions.value = remoteDataSource.getPredictions(query)
-            _rideState.value = RideState.SEARCH
+            placesPredictions.value = repository.getPredictions(query)
+            _rideState.value = RideState.SELECT_DESTINATION
         }
     }
 
-    fun onPlaceSelected(placeId: String) {
-        viewModelScope.launch {
-            val res =
-                remoteDataSource.getGeocoding(placeId, API_KEY)
-            res?.let {
-                destination.value = LatLng(it.results[0].geometry.location.lat,
-                    it.results[0].geometry.location.lng)
-                requestCurrentLocation()
-            }
-        }
+    fun goBackToSelectDestination() {
+        _rideState.value = RideState.SELECT_DESTINATION
     }
 
-    private fun requestCurrentLocation() {
+    private fun updateUserCurrentLocation() {
         _requestCurrentLocation.value = Event(Unit)
-        Log.d("HomeViewModel", destination.value.toString())
-    }
-
-    fun routeSelected(origin: LatLng) {
-        destination.value?.let {
-            requestRoutePath(origin, it)
-        }
-    }
-
-    private fun requestRoutePath(origin: LatLng, destination: LatLng) {
-        val fromOrigin = origin.latitude.toString() + "," + origin.longitude.toString()
-        val toDestination = destination.latitude.toString() + "," + destination.longitude.toString()
-
-        viewModelScope.launch {
-            val response = remoteDataSource.getDirection(fromOrigin, toDestination, API_KEY)
-            _rideState.value = RideState.SELECT_CAR
-            drawPolyline(response)
-            generateMarkers(listOf(destination), false)
-        }
-    }
-
-    private fun drawPolyline(response: DirectionResponses?) {
-        val shape: String? = response?.routes?.get(0)?.overviewPolyline?.points
-
-        val decodedShape = PolyUtil.decode(shape)
-//        for (i in decodedShape){
-//            Log.d("HomeViewModel", "$i \n")
-//        }
-        val polyline = PolylineOptions()
-            .addAll(decodedShape)
-            .width(8f)
-            .color(Color.BLUE)
-        _drawPolyLine.value = Event(polyline)
-    }
-
-    private fun generateMarkers(markerList: List<LatLng>, isDriver: Boolean) {
-        val res = mutableListOf<MarkerOptions>()
-
-        if (isDriver) {
-            var bitmapIcon =
-                BitmapFactory.decodeResource(context.resources, R.drawable.car_model)
-            val resizedBitmapIcon = getResizedBitmap(bitmapIcon, 56, 56)
-
-            for (item in markerList) {
-                res.add(MarkerOptions()
-                    .position(item)
-                    .icon(resizedBitmapIcon?.let {
-                        BitmapDescriptorFactory.fromBitmap(it)
-                    })
-                    .title("Driver")
-                )
-            }
-        } else {
-            for (item in markerList) {
-                res.add(MarkerOptions()
-                    .position(item)
-                    .title("Destination")
-                )
-            }
-        }
-
-        drawMarkers.value = res
-    }
-
-    private fun showDrivers() {
-        viewModelScope.launch {
-            val res = remoteDataSource.getDrivers()
-            res?.let {
-                val markerList = mutableListOf<LatLng>()
-                for (item in it) {
-                    item?.let { driver ->
-                        Log.d("HomeViewModel", "Driver location ${driver.location?.lat}")
-                        markerList.add(LatLng(item.location!!.lat!!, item.location.lng!!))
-                    }
-                }
-                generateMarkers(markerList, true)
-            }
-        }
-    }
-
-    fun goBackToSelectDestination(){
-        _rideState.value = RideState.SEARCH
     }
 }
 
-enum class RideState{
-    SEARCH,
+enum class RideState {
+    SELECT_DESTINATION,
     LOADING,
     SELECT_CAR,
     ONGOING,

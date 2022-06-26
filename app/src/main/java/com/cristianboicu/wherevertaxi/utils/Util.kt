@@ -1,14 +1,9 @@
 package com.cristianboicu.wherevertaxi.utils
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.os.Handler
-import android.os.SystemClock
-import android.view.animation.Interpolator
-import android.view.animation.LinearInterpolator
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import java.util.regex.Pattern
 
 object Util {
@@ -29,31 +24,10 @@ object Util {
         return resizedBitmap
     }
 
-    private fun animateMarker(
-        myMap: GoogleMap, marker: Marker, directionPoint: List<LatLng>,
-        hideMarker: Boolean,
-    ) {
-        val handler = Handler()
-        val start: Long = SystemClock.uptimeMillis()
-        val proj = myMap.projection
-        val duration: Long = 30000
-        val interpolator: Interpolator = LinearInterpolator()
-        handler.post(object : Runnable {
-            var i = 0
-            override fun run() {
-                val elapsed: Long = SystemClock.uptimeMillis() - start
-                val t: Float = interpolator.getInterpolation(elapsed.toFloat()
-                        / duration)
-                if (i < directionPoint.size) marker.position = directionPoint[i]
-                i++
-                if (t < 1.0) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, 150)
-                } else {
-                    marker.isVisible = !hideMarker
-                }
-            }
-        })
+    fun getBitmapFromSvg(context: Context?, id: Int): Bitmap? {
+        val bitmapIcon =
+            BitmapFactory.decodeResource(context?.resources, id)
+        return getResizedBitmap(bitmapIcon, 56, 56)
     }
 
     fun isValidEmail(email: CharSequence): Boolean {

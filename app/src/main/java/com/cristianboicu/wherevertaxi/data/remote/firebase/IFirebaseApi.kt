@@ -1,8 +1,9 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
-import com.cristianboicu.wherevertaxi.data.model.Driver
+import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
 
 interface IFirebaseApi {
     fun getCurrentUser(): FirebaseUser?
@@ -11,7 +12,9 @@ interface IFirebaseApi {
 
     suspend fun updateUserData(uid: String, updatedUser: User)
 
-    suspend fun getDrivers(): List<Driver?>?
+    suspend fun getAvailableDrivers(): List<Driver?>?
+
+    suspend fun listenAvailableDrivers(): DatabaseReference
 
     fun logOutUser(): Boolean
 }

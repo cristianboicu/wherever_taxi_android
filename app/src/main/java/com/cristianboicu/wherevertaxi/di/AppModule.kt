@@ -66,7 +66,7 @@ abstract class AppModule {
         @Provides
         @Singleton
         fun providePlacesClient(@ApplicationContext context: Context): PlacesClient {
-            Places.initialize(context, context.getString(R.string.api_key))
+            Places.initialize(context, ProjectConstants.API_KEY)
             Log.d("AppModule", "Singleton init")
             return Places.createClient(context)
         }

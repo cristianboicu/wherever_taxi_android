@@ -1,8 +1,10 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
 import android.util.Log
-import com.cristianboicu.wherevertaxi.data.model.Driver
 import com.cristianboicu.wherevertaxi.data.model.User
+import com.cristianboicu.wherevertaxi.data.model.driver.Driver
+import com.cristianboicu.wherevertaxi.data.model.driver.DriverLocation
+import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -16,6 +18,8 @@ class FirebaseApi
     private val database: DatabaseReference,
 ) : IFirebaseApi {
 
+    private val TAG = "FirebaseApi"
+
     override fun getCurrentUser(): FirebaseUser? {
         return firebaseAuth.currentUser
     }
@@ -25,10 +29,10 @@ class FirebaseApi
             val res =
                 database.child(ProjectConstants.USERS_PATH).child(currentUser.uid).get().await()
             val fetchedUser = res.getValue(User::class.java)
-            Log.d("RemoteDataSource", "Got value $fetchedUser")
+            Log.d(TAG, "Got value $fetchedUser")
             fetchedUser
         } catch (e: Exception) {
-            Log.d("RemoteDataSource", "Error getting data ${e.message}")
+            Log.d(TAG, "Error getting data ${e.message}")
             null
         }
     }
@@ -46,20 +50,28 @@ class FirebaseApi
         }
     }
 
-    override suspend fun getDrivers(): List<Driver?>? {
+    override suspend fun getAvailableDrivers(): List<Driver?>? {
         return try {
             val listResult = mutableListOf<Driver?>()
+            val location = mutableListOf<DriverLocation?>()
             val res =
-                database.child(ProjectConstants.DRIVERS_PATH).get().await()
+                database.child(ProjectConstants.AVAILABLE_DRIVERS_PATH).get().await()
+
             for (driver in res.children) {
                 listResult.add(driver.getValue(Driver::class.java))
+//                Log.d(TAG, "id: ${driver.key}")
+//                location.add(driver.child("currentLocation").getValue(DriverLocation::class.java))
             }
-            Log.d("RemoteDataSource", "Got value $listResult")
+            Log.d(TAG, "Got value $location")
             listResult
         } catch (e: Exception) {
-            Log.d("RemoteDataSource", "Got drivers error ${e.message}")
+            Log.d(TAG, "Got drivers error ${e.message}")
             null
         }
+    }
+
+    override suspend fun listenAvailableDrivers(): DatabaseReference {
+        return database.child(ProjectConstants.AVAILABLE_DRIVERS_PATH)
     }
 
     override fun logOutUser(): Boolean {

@@ -2,8 +2,8 @@ package com.cristianboicu.wherevertaxi.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -27,30 +27,23 @@ import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesAdapter
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesListener
 import com.cristianboicu.wherevertaxi.utils.EventObserver
+import com.cristianboicu.wherevertaxi.utils.MarkerAnimation
+import com.cristianboicu.wherevertaxi.utils.Util
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.maps.android.PolyUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
-
-    private lateinit var map: GoogleMap
-    private lateinit var drawer: DrawerLayout
-    private val TAG = "HomeFragment"
-    private lateinit var mBottomSheetLayout: ConstraintLayout
-    private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    lateinit var viewModel: HomeViewModel
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var mCurrentLocation: Location
-    private lateinit var adapter: PlacesAdapter
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
@@ -65,6 +58,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
+    private lateinit var map: GoogleMap
+    private lateinit var drawer: DrawerLayout
+    private val TAG = "HomeFragment"
+    private lateinit var mBottomSheetLayout: ConstraintLayout
+    private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    lateinit var viewModel: HomeViewModel
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var mCurrentLocation: Location
+    private lateinit var adapter: PlacesAdapter
+
+    private val listOfDrivers = mutableListOf<Marker>()
+    private var clientTripPath: Polyline? = null
+    private var clientTripDestinationMarker: Marker? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -75,74 +82,90 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(this.requireActivity())
-
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-        setUpUi(binding, savedInstanceState)
-        Log.d("HomeFragment Prediction: ", "oncreate")
 
         binding.viewModel = viewModel
         binding.bottomSheet.viewModel = viewModel
 
-        setUpObserver()
-
         adapter = PlacesAdapter(PlacesListener {
-            viewModel.onPlaceSelected(it)
+            viewModel.onDestinationSelected(it)
         })
-
         binding.bottomSheet.rvAutocomplete.adapter = adapter
+
+        setUpUi(binding, savedInstanceState)
+        setUpObserver()
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d("HomeFragment Prediction: ", "onviewcreated")
 
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d("HomeFragment Prediction: ", "onattach")
-
-    }
     @SuppressLint("MissingPermission")
     private fun setUpObserver() {
-        viewModel.drawMarkers.observe(viewLifecycleOwner) {
-            for (marker in it) {
-                map.addMarker(marker)
+
+        viewModel.driverToClientPath.observe(viewLifecycleOwner) { it ->
+            val resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)
+            val decodedShape = PolyUtil.decode(it)
+
+            map.clear()
+            val marker = map.addMarker(
+                MarkerOptions()
+                    .position(decodedShape[0]).icon(resizedBitmapIcon?.let {
+                        BitmapDescriptorFactory.fromBitmap(it)
+                    }))
+
+            MarkerAnimation().animateLine(decodedShape as ArrayList<LatLng>, marker!!)
+        }
+
+        viewModel.clientToDestinationPath.observe(viewLifecycleOwner) {
+            val decodedShape = PolyUtil.decode(it)
+            clientTripPath?.remove()
+            clientTripDestinationMarker?.remove()
+
+            clientTripPath = map.addPolyline(drawPolyline(decodedShape))
+            clientTripDestinationMarker = map.addMarker(
+                MarkerOptions()
+                    .position(decodedShape[decodedShape.size - 1]))
+        }
+
+        viewModel.availableDriverMarkers.observe(viewLifecycleOwner) {
+            for (driver in listOfDrivers) {
+                driver.remove()
             }
-            if (it.isNotEmpty()) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(it[it.size - 1].position, 15f))
+            listOfDrivers.clear()
+
+            for (marker in it) {
+                listOfDrivers.add(map.addMarker(marker)!!)
             }
         }
 
-        viewModel.drawPolyLine.observe(viewLifecycleOwner, EventObserver {
+        viewModel.clearMap.observe(viewLifecycleOwner, EventObserver {
             map.clear()
-            map.addPolyline(it)
-            Log.d("HomeFragment draw: ", "ploy")
+            Log.d(TAG, "clear map")
         })
 
-        viewModel.placesPredictions.observe(viewLifecycleOwner){
+        viewModel.placesPredictions.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-            Log.d("HomeFragment Prediction: ", "item.placeId")
         }
 
         viewModel.requestCurrentLocation.observe(viewLifecycleOwner, EventObserver {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     location?.let {
-                        mCurrentLocation = it
-                        viewModel.routeSelected(LatLng(it.latitude, it.longitude))
-                        Log.d("HomeFragment",
-                            "${mCurrentLocation.latitude} , ${mCurrentLocation.longitude}")
+                        viewModel.origin.value = LatLng(it.latitude, it.longitude)
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude,
+                            it.longitude),
+                            15f))
                     }
                 }
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
+
+    private fun drawPolyline(line: List<LatLng>): PolylineOptions {
+        return PolylineOptions()
+            .addAll(line)
+            .width(8f)
+            .color(Color.BLUE)
     }
 
     private fun setUpUi(binding: FragmentHomeBinding, savedInstanceState: Bundle?) {
@@ -164,6 +187,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         binding.bottomSheet.standardCar.layoutCarType.isSelected = true
         binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
+
 
         binding.bottomSheet.standardCar.layoutCarType.setOnClickListener {
             it.isSelected = true
@@ -200,7 +224,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
-        // 1. Check if permissions are granted, if so, enable the my location layer
         if (ContextCompat.checkSelfPermission(
                 requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -221,11 +244,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
+    }
+
     /**
      * Displays a dialog with error message explaining that the location permission is missing.
      */
     private fun showMissingPermissionError() {
-//        newInstance(true).show(supportFragmentManager, "dialog")
     }
 
     override fun onMyLocationButtonClick(): Boolean {
