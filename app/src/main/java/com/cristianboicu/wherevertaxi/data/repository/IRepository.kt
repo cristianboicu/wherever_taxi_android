@@ -29,6 +29,8 @@ interface IRepository {
 
     suspend fun listenAvailableDrivers(): DatabaseReference
 
+    suspend fun listenToRequestedRide(uid: String): DatabaseReference
+
     suspend fun updateUserData(uid: String, updatedUser: User)
 
     suspend fun postRideRequest(

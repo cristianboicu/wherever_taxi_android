@@ -72,6 +72,10 @@ class FirebaseApi
         return database.child(ProjectConstants.AVAILABLE_DRIVERS_PATH)
     }
 
+    override suspend fun listenToRequestedRide(uid: String): DatabaseReference {
+        return database.child(ProjectConstants.ONGOING_RIDES_PATH).child(uid)
+    }
+
     override fun logOutUser(): Boolean {
         return try {
             firebaseAuth.signOut()

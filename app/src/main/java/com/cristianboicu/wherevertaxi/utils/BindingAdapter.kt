@@ -64,6 +64,23 @@ fun View.setSearchVisibility(state: RideState) {
     }
 }
 
+@BindingAdapter("setRideAcceptedVisibility")
+fun View.setRideAcceptedVisibility(state: RideState) {
+    visibility = if (state == RideState.RIDE_ACCEPTED) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}
+@BindingAdapter("setRidePendingVisibility")
+fun View.setRidePendingVisibility(state: RideState) {
+    visibility = if (state == RideState.RIDE_PENDING) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}
+
 @BindingAdapter("setNavigationDrawerVisibility")
 fun View.setNavigationDrawerVisibility(state: RideState) {
     visibility = if (state != RideState.SELECT_CAR) {

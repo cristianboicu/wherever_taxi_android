@@ -22,6 +22,25 @@ class MarkerAnimation {
         animateMarker()
     }
 
+    fun animateMarkerToICS(
+        marker: Marker?,
+        finalPosition: LatLng?,
+        latLngInterpolator: LatLngInterpolator = LatLngInterpolator.Spherical(),
+    ) {
+        val typeEvaluator: TypeEvaluator<LatLng> =
+            TypeEvaluator { fraction, startValue, endValue ->
+                latLngInterpolator.interpolate(fraction,
+                    startValue!!,
+                    endValue!!)
+            }
+        val property = Property.of(
+            Marker::class.java,
+            LatLng::class.java, "position")
+        val animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, finalPosition)
+        animator.duration = 1900
+        animator.start()
+    }
+
     fun animateMarker() {
         val typeEvaluator: TypeEvaluator<LatLng> =
             TypeEvaluator { fraction, startValue, endValue ->

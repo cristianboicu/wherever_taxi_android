@@ -71,6 +71,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private val listOfDrivers = mutableListOf<Marker>()
     private var clientTripPath: Polyline? = null
     private var clientTripDestinationMarker: Marker? = null
+    private var driverMarker: Marker? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,25 +99,30 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return binding.root
     }
 
-
     @SuppressLint("MissingPermission")
     private fun setUpObserver() {
 
-        viewModel.driverToClientPath.observe(viewLifecycleOwner) { it ->
+        viewModel.driverLocation.observe(viewLifecycleOwner) { it ->
+            Log.d("HomeFragment", it.toString())
             val resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)
-            val decodedShape = PolyUtil.decode(it)
 
-            map.clear()
-            val marker = map.addMarker(
-                MarkerOptions()
-                    .position(decodedShape[0]).icon(resizedBitmapIcon?.let {
-                        BitmapDescriptorFactory.fromBitmap(it)
-                    }))
+            for (driver in listOfDrivers){
+                driver.remove()
+            }
 
-            MarkerAnimation().animateLine(decodedShape as ArrayList<LatLng>, marker!!)
+            if (driverMarker==null){
+                driverMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(it).icon(resizedBitmapIcon?.let {
+                            BitmapDescriptorFactory.fromBitmap(it)
+                        }))
+            }
+            MarkerAnimation().animateMarkerToICS(driverMarker, it)
         }
 
         viewModel.clientToDestinationPath.observe(viewLifecycleOwner) {
+            Log.d("HomeFragment", "clint path ${it.toString()}")
+
             val decodedShape = PolyUtil.decode(it)
             clientTripPath?.remove()
             clientTripDestinationMarker?.remove()

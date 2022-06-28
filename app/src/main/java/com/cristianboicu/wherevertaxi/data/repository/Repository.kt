@@ -72,4 +72,8 @@ class Repository @Inject constructor(private val remoteDataSource: IRemoteDataSo
     override suspend fun listenAvailableDrivers(): DatabaseReference {
         return remoteDataSource.listenAvailableDrivers()
     }
+
+    override suspend fun listenToRequestedRide(uid: String): DatabaseReference {
+        return remoteDataSource.listenToRequestedRide(uid)
+    }
 }

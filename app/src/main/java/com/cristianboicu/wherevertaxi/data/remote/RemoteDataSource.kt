@@ -33,6 +33,10 @@ class RemoteDataSource @Inject constructor(
         return firebaseApi.listenAvailableDrivers()
     }
 
+    override suspend fun listenToRequestedRide(uid: String): DatabaseReference {
+        return firebaseApi.listenToRequestedRide(uid)
+    }
+
     override fun logOutUser(): Boolean {
         return firebaseApi.logOutUser()
     }

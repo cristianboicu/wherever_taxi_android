@@ -8,6 +8,7 @@ object ProjectConstants {
     const val DRIVERS_PATH = "drivers"
     const val AVAILABLE_DRIVERS_PATH = "availableDrivers"
     const val RIDE_REQUEST_PATH = "rideRequests"
+    const val ONGOING_RIDES_PATH = "ongoingRides"
     const val MAPS_URL = "https://maps.googleapis.com/"
     const val API_KEY = BuildConfig.MAPS_API_KEY
 }

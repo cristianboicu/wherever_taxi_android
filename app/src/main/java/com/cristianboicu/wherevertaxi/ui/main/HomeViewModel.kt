@@ -9,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
+import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequestData
+import com.cristianboicu.wherevertaxi.data.model.ride.toLatLng
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.databinding.ItemCarBinding
 import com.cristianboicu.wherevertaxi.utils.Event
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,8 +61,8 @@ class HomeViewModel @Inject constructor(
     private val _availableDrivers = MutableLiveData<HashMap<String, AvailableDriver>?>()
     val availableDrivers = _availableDrivers
 
-    private val _driverToClientPath = MutableLiveData<String>()
-    val driverToClientPath = _driverToClientPath
+    private val _driverLocation = MutableLiveData<LatLng>()
+    val driverLocation = _driverLocation
 
     private val _clientToDestinationPath = MutableLiveData<String>()
     val clientToDestinationPath = _clientToDestinationPath
@@ -95,16 +98,12 @@ class HomeViewModel @Inject constructor(
         uid: String?,
         vehicleClass: String,
     ) {
-        //add request to db
         val drivers = availableDrivers.value?.toList()
         val driverLocation = drivers?.get(1)?.second?.currentLocation
 
         if (driverLocation != null && origin != null) {
             viewModelScope.launch {
-                _driverToClientPath.value =
-                    repository.getDirection(LatLng(driverLocation.lat!!, driverLocation.lng!!),
-                        origin)
-//                _rideState.value = RideState.SELECT_CAR
+                _rideState.value = RideState.SELECT_CAR
                 val rideRequestData =
                     RideRequestData(
                         originLocation = GeoLocation(origin.latitude, origin.longitude),
@@ -117,12 +116,60 @@ class HomeViewModel @Inject constructor(
                         payment = "Cash"
                     )
                 repository.postRideRequest(RideRequest(uid!!, rideRequestData))
+                listenToRequestedRide(uid)
             }
         }
     }
 
-    fun onRideAccepted(){
-        _rideState.value = RideState.ONGOING
+    private val rideAcceptedListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            if (dataSnapshot.exists()) {
+                val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
+                ongoingRide?.driverLocation.let {
+                    Log.d(TAG, "ride accepted")
+                    onRideAccepted(userId!!)
+                }
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+        }
+    }
+
+    private val rideOngoingListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            viewModelScope.launch {
+                if (dataSnapshot.exists()) {
+                    val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
+                    ongoingRide?.driverLocation?.let {
+                        _driverLocation.postValue(it.toLatLng())
+                        Log.d(TAG, "driver lcoation ${_driverLocation.value}")
+                    }
+                }
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+        }
+    }
+
+    private lateinit var res: DatabaseReference
+
+    private fun listenToRequestedRide(uid: String) {
+        viewModelScope.launch {
+            _rideState.value = RideState.RIDE_PENDING
+            res = repository.listenToRequestedRide(uid)
+            res.addValueEventListener(rideAcceptedListener)
+        }
+    }
+
+    fun onRideAccepted(uid: String) {
+        res.removeEventListener(rideAcceptedListener)
+        res.addValueEventListener(rideOngoingListener)
+        _rideState.value = RideState.RIDE_ACCEPTED
+
     }
 
     fun onDestinationSelected(destinationId: String) {
@@ -204,8 +251,8 @@ class HomeViewModel @Inject constructor(
 
 enum class RideState {
     SELECT_DESTINATION,
-    LOADING,
+    RIDE_PENDING,
     SELECT_CAR,
-    ONGOING,
-    FINISH
+    RIDE_ACCEPTED,
+    RIDE_COMPLETED
 }
