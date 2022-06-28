@@ -84,8 +84,6 @@ class LogInFragment : Fragment() {
         )
     }
     fun navigateVerificationCode() {
-        Log.d("Aloha", "epta")
-
         this.findNavController().navigate(
             LogInFragmentDirections.actionLogInFragmentToVerificationCodeFragment()
         )

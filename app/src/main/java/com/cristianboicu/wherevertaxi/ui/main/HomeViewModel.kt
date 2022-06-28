@@ -121,6 +121,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onRideAccepted(){
+        _rideState.value = RideState.ONGOING
+    }
+
     fun onDestinationSelected(destinationId: String) {
         viewModelScope.launch {
             val destinationLatLng =

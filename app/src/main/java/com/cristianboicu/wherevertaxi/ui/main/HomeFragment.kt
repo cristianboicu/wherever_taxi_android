@@ -187,7 +187,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         binding.bottomSheet.standardCar.layoutCarType.isSelected = true
         binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
-
+        binding.bottomSheet.comfortCar.tvCarType.text = "Comfort"
+        binding.bottomSheet.comfortCar.tvPrice.text = "LEI 22.3"
 
         binding.bottomSheet.standardCar.layoutCarType.setOnClickListener {
             it.isSelected = true

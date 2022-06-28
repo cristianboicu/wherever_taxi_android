@@ -147,6 +147,7 @@ class MainActivity : AppCompatActivity(), LogInFragment.SendVerificationCode {
     }
 
     private fun saveUserToDb() {
+        //TODO Check if user already exists
         val user = User(phone = phnb)
         database.child("users").child(firebaseAuth.currentUser!!.uid).setValue(user)
     }
