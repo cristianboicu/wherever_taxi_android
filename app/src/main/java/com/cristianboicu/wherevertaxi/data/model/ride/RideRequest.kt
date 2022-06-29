@@ -4,10 +4,6 @@ import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
 
 data class RideRequest constructor(
     val uid: String,
-    val rideRequestData: RideRequestData,
-)
-
-data class RideRequestData constructor(
     val originLocation: GeoLocation,
     val destinationLocation: GeoLocation,
     val vehicleClass: String,
@@ -16,3 +12,7 @@ data class RideRequestData constructor(
     val price: Double,
     val payment: String,
 )
+//
+//data class RideRequestData constructor(
+//
+//)

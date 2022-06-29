@@ -72,8 +72,12 @@ class FirebaseApi
         return database.child(ProjectConstants.AVAILABLE_DRIVERS_PATH)
     }
 
-    override suspend fun listenToRequestedRide(uid: String): DatabaseReference {
-        return database.child(ProjectConstants.ONGOING_RIDES_PATH).child(uid)
+    override suspend fun listenToRequestedRide(rideId: String): DatabaseReference {
+        return database.child(ProjectConstants.ONGOING_RIDES_PATH).child(rideId)
+    }
+
+    override suspend fun listenToCompletedRide(rideId: String): DatabaseReference {
+        return database.child(ProjectConstants.COMPLETED_RIDES_PATH).child(rideId)
     }
 
     override fun logOutUser(): Boolean {
@@ -87,13 +91,15 @@ class FirebaseApi
 
     override suspend fun postRideRequest(
         rideRequest: RideRequest,
-    ) {
-        try {
-            database.child(RIDE_REQUEST_PATH).child(rideRequest.uid)
-                .setValue(rideRequest.rideRequestData).await()
+    ): String? {
+        return try {
+            val key = database.child(RIDE_REQUEST_PATH).push().key
+            database.child(RIDE_REQUEST_PATH).child(key!!).setValue(rideRequest).await()
             Log.d(TAG, "succes adding ride request")
+            key
         } catch (e: Exception) {
             Log.d(TAG, "error adding ride request ${e.message}")
+            null
         }
     }
 }

@@ -121,16 +121,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         }
 
         viewModel.clientToDestinationPath.observe(viewLifecycleOwner) {
-            Log.d("HomeFragment", "clint path ${it.toString()}")
+            it?.let {
+                Log.d("HomeFragment", "clint path ${it.toString()}")
 
-            val decodedShape = PolyUtil.decode(it)
-            clientTripPath?.remove()
-            clientTripDestinationMarker?.remove()
+                val decodedShape = PolyUtil.decode(it)
+                clientTripPath?.remove()
+                clientTripDestinationMarker?.remove()
 
-            clientTripPath = map.addPolyline(drawPolyline(decodedShape))
-            clientTripDestinationMarker = map.addMarker(
-                MarkerOptions()
-                    .position(decodedShape[decodedShape.size - 1]))
+                clientTripPath = map.addPolyline(drawPolyline(decodedShape))
+                clientTripDestinationMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(decodedShape[decodedShape.size - 1]))
+            }
         }
 
         viewModel.availableDriverMarkers.observe(viewLifecycleOwner) {

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -23,6 +24,8 @@
             setSearchVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -114,12 +117,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_ride_accpted"
+            android:id="@+id/layout_ride_accepted"
             setRideAcceptedVisibility="@{viewModel.rideState}"
+            setAcceptedRideData="@{viewModel.currentRideData}"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:paddingHorizontal="@dimen/medium_value"
             android:layout_marginTop="@dimen/medium_value"
-            android:visibility="gone"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -131,6 +136,35 @@
                 android:text="@string/ride_accepted"
                 android:textColor="@color/black"
                 android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/tv_driver_name"
+                tools:text = "Aliosa Popovici"
+                android:layout_marginTop="@dimen/medium_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_driver_vehicle"
+                android:layout_width="wrap_content"
+                android:layout_marginVertical="4dp"
+                tools:text = "Lamborghini"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_driver_vehicle_class"
+                android:layout_width="wrap_content"
+                tools:text = "Comfort"
+                android:layout_marginVertical="4dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_driver_license_plate_number"
+                android:layout_width="wrap_content"
+                android:layout_marginVertical="4dp"
+                tools:text = "Comfort"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -140,6 +174,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/medium_value"
             android:gravity="center_horizontal"
+            android:visibility="gone"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

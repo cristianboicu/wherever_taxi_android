@@ -17,7 +17,9 @@ interface IRemoteDataSource {
 
     suspend fun listenAvailableDrivers(): DatabaseReference
 
-    suspend fun listenToRequestedRide(uid: String): DatabaseReference
+    suspend fun listenToRequestedRide(rideId: String): DatabaseReference
+
+    suspend fun listenToCompletedRide(rideId: String): DatabaseReference
 
     fun logOutUser(): Boolean
 
@@ -40,5 +42,5 @@ interface IRemoteDataSource {
 
     suspend fun postRideRequest(
         rideRequest: RideRequest
-    )
+    ): String?
 }

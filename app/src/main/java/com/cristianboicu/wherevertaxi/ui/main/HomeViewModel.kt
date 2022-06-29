@@ -11,7 +11,6 @@ import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
 import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
-import com.cristianboicu.wherevertaxi.data.model.ride.RideRequestData
 import com.cristianboicu.wherevertaxi.data.model.ride.toLatLng
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.databinding.ItemCarBinding
@@ -64,13 +63,17 @@ class HomeViewModel @Inject constructor(
     private val _driverLocation = MutableLiveData<LatLng>()
     val driverLocation = _driverLocation
 
-    private val _clientToDestinationPath = MutableLiveData<String>()
+    private val _clientToDestinationPath = MutableLiveData<String?>()
     val clientToDestinationPath = _clientToDestinationPath
 
     private val destination = MutableLiveData<LatLng>()
     val origin = MutableLiveData<LatLng>()
 
     private val userId = repository.getLoggedUserId()
+
+    val currentRideData = MutableLiveData<OngoingRideData?>()
+
+    private var currentRideId: String? = null
 
     init {
         updateUserCurrentLocation()
@@ -104,8 +107,9 @@ class HomeViewModel @Inject constructor(
         if (driverLocation != null && origin != null) {
             viewModelScope.launch {
                 _rideState.value = RideState.SELECT_CAR
-                val rideRequestData =
-                    RideRequestData(
+                val rideRequest =
+                    RideRequest(
+                        uid = uid!!,
                         originLocation = GeoLocation(origin.latitude, origin.longitude),
                         destinationLocation = GeoLocation(destination!!.latitude,
                             destination.longitude),
@@ -115,8 +119,10 @@ class HomeViewModel @Inject constructor(
                         price = 15.8,
                         payment = "Cash"
                     )
-                repository.postRideRequest(RideRequest(uid!!, rideRequestData))
-                listenToRequestedRide(uid)
+                val key = repository.postRideRequest(rideRequest)
+                key?.let {
+                    listenToRequestedRide(it)
+                }
             }
         }
     }
@@ -124,10 +130,11 @@ class HomeViewModel @Inject constructor(
     private val rideAcceptedListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             if (dataSnapshot.exists()) {
-                val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
-                ongoingRide?.driverLocation.let {
+                val ongoingRideData = dataSnapshot.getValue<OngoingRideData>()
+                ongoingRideData?.let {
                     Log.d(TAG, "ride accepted")
-                    onRideAccepted(userId!!)
+                    currentRideData.value = ongoingRideData
+                    onRideAccepted(currentRideId!!)
                 }
             }
         }
@@ -155,21 +162,61 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private lateinit var res: DatabaseReference
+    private val rideCompletionListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            viewModelScope.launch {
+                if (dataSnapshot.exists() && dataSnapshot.hasChildren()) {
+                    onRideCompleted(currentRideId!!)
+                }
+            }
+        }
 
-    private fun listenToRequestedRide(uid: String) {
-        viewModelScope.launch {
-            _rideState.value = RideState.RIDE_PENDING
-            res = repository.listenToRequestedRide(uid)
-            res.addValueEventListener(rideAcceptedListener)
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
         }
     }
 
-    fun onRideAccepted(uid: String) {
-        res.removeEventListener(rideAcceptedListener)
-        res.addValueEventListener(rideOngoingListener)
+    private lateinit var dbReferenceListener: DatabaseReference
+    private lateinit var dbCompletedRidesListener: DatabaseReference
+
+    private fun listenToRequestedRide(rideId: String) {
+        viewModelScope.launch {
+            currentRideId = rideId
+            _rideState.value = RideState.RIDE_PENDING
+            dbReferenceListener = repository.listenToRequestedRide(rideId)
+            dbReferenceListener.addValueEventListener(rideAcceptedListener)
+        }
+    }
+
+    fun onRideAccepted(rideId: String) {
+        dbReferenceListener.removeEventListener(rideAcceptedListener)
+        dbReferenceListener.addValueEventListener(rideOngoingListener)
         _rideState.value = RideState.RIDE_ACCEPTED
 
+        viewModelScope.launch {
+            dbCompletedRidesListener = repository.listenToCompletedRide(rideId)
+            dbCompletedRidesListener.addValueEventListener(rideCompletionListener)
+        }
+    }
+
+    fun onRideCompleted(rideId: String) {
+        dbReferenceListener.removeEventListener(rideOngoingListener)
+        dbCompletedRidesListener.removeEventListener(rideCompletionListener)
+        _rideState.value = RideState.RIDE_COMPLETED
+
+        viewModelScope.launch {
+            for (i in 0..1000000) {
+                Log.d(TAG, "wait to complete")
+            }
+            resetData()
+        }
+    }
+
+    private fun resetData() {
+        currentRideId = null
+        _clientToDestinationPath.value = null
+        _clearMap.value = Event(Unit)
+        _rideState.value = RideState.SELECT_DESTINATION
     }
 
     fun onDestinationSelected(destinationId: String) {

@@ -34,7 +34,7 @@ class Repository @Inject constructor(private val remoteDataSource: IRemoteDataSo
         return remoteDataSource.updateUserData(uid, updatedUser)
     }
 
-    override suspend fun postRideRequest(rideRequest: RideRequest) {
+    override suspend fun postRideRequest(rideRequest: RideRequest): String? {
         return remoteDataSource.postRideRequest(rideRequest)
     }
 
@@ -73,7 +73,11 @@ class Repository @Inject constructor(private val remoteDataSource: IRemoteDataSo
         return remoteDataSource.listenAvailableDrivers()
     }
 
-    override suspend fun listenToRequestedRide(uid: String): DatabaseReference {
-        return remoteDataSource.listenToRequestedRide(uid)
+    override suspend fun listenToRequestedRide(rideId: String): DatabaseReference {
+        return remoteDataSource.listenToRequestedRide(rideId)
+    }
+
+    override suspend fun listenToCompletedRide(rideId: String): DatabaseReference {
+        return remoteDataSource.listenToCompletedRide(rideId)
     }
 }

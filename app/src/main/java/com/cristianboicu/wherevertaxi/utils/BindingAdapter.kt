@@ -8,6 +8,7 @@ import androidx.databinding.BindingAdapter
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
+import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
 import com.cristianboicu.wherevertaxi.ui.main.RideState
 
 @SuppressLint("SetTextI18n")
@@ -122,4 +123,14 @@ fun View.setEnabledDisabledComfort(availableDrivers: Map<String, AvailableDriver
     }
     comfort.isEnabled = availableComfort
     standard.isEnabled = availableStandard
+}
+
+@BindingAdapter("setAcceptedRideData")
+fun View.setAcceptedRideData(ongoingRideData: OngoingRideData?) {
+    ongoingRideData?.let {
+        findViewById<TextView>(R.id.tv_driver_name).text = ongoingRideData.driverName
+        findViewById<TextView>(R.id.tv_driver_vehicle).text = ongoingRideData.vehicle
+        findViewById<TextView>(R.id.tv_driver_vehicle_class).text = ongoingRideData.vehicleClass
+        findViewById<TextView>(R.id.tv_driver_license_plate_number).text = ongoingRideData.licensePlateNumber
+    }
 }
