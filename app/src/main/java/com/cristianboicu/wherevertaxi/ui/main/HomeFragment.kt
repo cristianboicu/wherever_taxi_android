@@ -103,14 +103,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun setUpObserver() {
 
         viewModel.driverLocation.observe(viewLifecycleOwner) { it ->
-            Log.d("HomeFragment", it.toString())
+            Log.d("HomeFragment driver location", it.toString())
             val resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)
 
-            for (driver in listOfDrivers){
+            for (driver in listOfDrivers) {
                 driver.remove()
             }
 
-            if (driverMarker==null){
+            if (driverMarker == null) {
                 driverMarker = map.addMarker(
                     MarkerOptions()
                         .position(it).icon(resizedBitmapIcon?.let {
@@ -148,6 +148,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         viewModel.clearMap.observe(viewLifecycleOwner, EventObserver {
             map.clear()
+            driverMarker = null
             Log.d(TAG, "clear map")
         })
 
@@ -186,7 +187,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
 
         binding.bottomSheet.etWhereTo.setOnClickListener {
-            sheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             sheetBehavior.setDraggable(true)
         }
         binding.btnNavigationDrawer.setOnClickListener {
@@ -215,7 +216,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-        rlp.setMargins(0, 0, 30, 480)
+        rlp.setMargins(0, 0, 30, 720)
     }
 
     private fun openDrawer() {

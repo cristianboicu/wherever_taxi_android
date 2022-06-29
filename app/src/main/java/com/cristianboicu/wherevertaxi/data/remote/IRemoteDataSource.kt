@@ -21,6 +21,8 @@ interface IRemoteDataSource {
 
     suspend fun listenToCompletedRide(rideId: String): DatabaseReference
 
+    suspend fun cancelRide(rideId: String)
+
     fun logOutUser(): Boolean
 
     suspend fun updateUserData(uid: String, updatedUser: User)

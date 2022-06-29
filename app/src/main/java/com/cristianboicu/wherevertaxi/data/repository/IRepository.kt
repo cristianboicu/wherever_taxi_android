@@ -16,6 +16,8 @@ interface IRepository {
 
     fun logOutUser(): Boolean
 
+    suspend fun cancelRide(rideId: String)
+
     suspend fun getDirection(origin: LatLng, destination: LatLng): String?
 
     suspend fun getPredictions(query: String): MutableList<AutocompletePrediction>

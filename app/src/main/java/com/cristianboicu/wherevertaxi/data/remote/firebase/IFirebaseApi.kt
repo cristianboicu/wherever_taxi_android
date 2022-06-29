@@ -22,6 +22,8 @@ interface IFirebaseApi {
 
     suspend fun listenToCompletedRide(rideId: String): DatabaseReference
 
+    suspend fun cancelRide(rideId: String)
+
     fun logOutUser(): Boolean
 
     suspend fun postRideRequest(

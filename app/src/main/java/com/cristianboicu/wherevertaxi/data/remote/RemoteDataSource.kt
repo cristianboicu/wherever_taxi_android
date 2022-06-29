@@ -41,6 +41,10 @@ class RemoteDataSource @Inject constructor(
         return firebaseApi.listenToCompletedRide(rideId)
     }
 
+    override suspend fun cancelRide(rideId: String) {
+        return firebaseApi.cancelRide(rideId)
+    }
+
     override fun logOutUser(): Boolean {
         return firebaseApi.logOutUser()
     }

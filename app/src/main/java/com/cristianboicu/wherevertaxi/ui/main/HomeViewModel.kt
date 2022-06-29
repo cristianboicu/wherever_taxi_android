@@ -73,7 +73,80 @@ class HomeViewModel @Inject constructor(
 
     val currentRideData = MutableLiveData<OngoingRideData?>()
 
-    private var currentRideId: String? = null
+    var currentRideId: String? = null
+
+    private lateinit var dbReferenceListener: DatabaseReference
+    private lateinit var dbCompletedRidesListener: DatabaseReference
+    private lateinit var dbAvailableDriversListener: DatabaseReference
+
+    private val availableDriversListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            _availableDrivers.value = dataSnapshot.getValue<HashMap<String, AvailableDriver>>()
+            Log.w(TAG, "data changed ${_availableDrivers.value}")
+
+            _availableDrivers.value?.let {
+                val markerList = mutableListOf<LatLng>()
+                for (item in it) {
+                    markerList.add(LatLng(item.value.currentLocation!!.lat!!,
+                        item.value.currentLocation!!.lng!!))
+                }
+                generateAvailableDriverMarkers(markerList)
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+        }
+    }
+
+    private val rideAcceptedListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            if (dataSnapshot.exists()) {
+                val ongoingRideData = dataSnapshot.getValue<OngoingRideData>()
+                ongoingRideData?.let {
+                    Log.d(TAG, "ride accepted")
+                    currentRideData.value = ongoingRideData
+                    onRideAccepted(currentRideId!!)
+                }
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+        }
+    }
+
+    private val rideOngoingListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            viewModelScope.launch {
+                if (dataSnapshot.exists()) {
+                    val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
+                    ongoingRide?.driverLocation?.let {
+                        _driverLocation.postValue(it.toLatLng())
+                        Log.d(TAG, "driver lcoation ${_driverLocation.value}")
+                    }
+                }
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+        }
+    }
+
+    private val rideCompletionListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            viewModelScope.launch {
+                if (dataSnapshot.exists() && dataSnapshot.hasChildren()) {
+                    onRideCompleted(currentRideId!!)
+                }
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+        }
+    }
 
     init {
         updateUserCurrentLocation()
@@ -127,58 +200,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private val rideAcceptedListener = object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            if (dataSnapshot.exists()) {
-                val ongoingRideData = dataSnapshot.getValue<OngoingRideData>()
-                ongoingRideData?.let {
-                    Log.d(TAG, "ride accepted")
-                    currentRideData.value = ongoingRideData
-                    onRideAccepted(currentRideId!!)
-                }
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-        }
-    }
-
-    private val rideOngoingListener = object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            viewModelScope.launch {
-                if (dataSnapshot.exists()) {
-                    val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
-                    ongoingRide?.driverLocation?.let {
-                        _driverLocation.postValue(it.toLatLng())
-                        Log.d(TAG, "driver lcoation ${_driverLocation.value}")
-                    }
-                }
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-        }
-    }
-
-    private val rideCompletionListener = object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            viewModelScope.launch {
-                if (dataSnapshot.exists() && dataSnapshot.hasChildren()) {
-                    onRideCompleted(currentRideId!!)
-                }
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-        }
-    }
-
-    private lateinit var dbReferenceListener: DatabaseReference
-    private lateinit var dbCompletedRidesListener: DatabaseReference
-
     private fun listenToRequestedRide(rideId: String) {
         viewModelScope.launch {
             currentRideId = rideId
@@ -188,7 +209,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onRideCancel(rideId: String) {
+        viewModelScope.launch {
+            repository.cancelRide(rideId)
+            dbReferenceListener.removeEventListener(rideAcceptedListener)
+            resetData()
+        }
+    }
+
     fun onRideAccepted(rideId: String) {
+        dbAvailableDriversListener.removeEventListener(availableDriversListener)
         dbReferenceListener.removeEventListener(rideAcceptedListener)
         dbReferenceListener.addValueEventListener(rideOngoingListener)
         _rideState.value = RideState.RIDE_ACCEPTED
@@ -203,19 +233,13 @@ class HomeViewModel @Inject constructor(
         dbReferenceListener.removeEventListener(rideOngoingListener)
         dbCompletedRidesListener.removeEventListener(rideCompletionListener)
         _rideState.value = RideState.RIDE_COMPLETED
-
-        viewModelScope.launch {
-            for (i in 0..1000000) {
-                Log.d(TAG, "wait to complete")
-            }
-            resetData()
-        }
     }
 
-    private fun resetData() {
+    fun resetData() {
         currentRideId = null
         _clientToDestinationPath.value = null
         _clearMap.value = Event(Unit)
+        dbAvailableDriversListener.addValueEventListener(availableDriversListener)
         _rideState.value = RideState.SELECT_DESTINATION
     }
 
@@ -238,30 +262,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
+
     private fun listenAvailableDrivers() {
-        val availableDriversListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                _availableDrivers.value = dataSnapshot.getValue<HashMap<String, AvailableDriver>>()
-                Log.w(TAG, "data changed ${_availableDrivers.value}")
-
-                _availableDrivers.value?.let {
-                    val markerList = mutableListOf<LatLng>()
-                    for (item in it) {
-                        markerList.add(LatLng(item.value.currentLocation!!.lat!!,
-                            item.value.currentLocation!!.lng!!))
-                    }
-                    generateAvailableDriverMarkers(markerList)
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        }
-
         viewModelScope.launch {
-            val res = repository.listenAvailableDrivers()
-            res.addValueEventListener(availableDriversListener)
+            dbAvailableDriversListener = repository.listenAvailableDrivers()
+            dbAvailableDriversListener.addValueEventListener(availableDriversListener)
         }
     }
 
@@ -285,10 +291,6 @@ class HomeViewModel @Inject constructor(
             placesPredictions.value = repository.getPredictions(query)
             _rideState.value = RideState.SELECT_DESTINATION
         }
-    }
-
-    fun goBackToSelectDestination() {
-        _rideState.value = RideState.SELECT_DESTINATION
     }
 
     private fun updateUserCurrentLocation() {

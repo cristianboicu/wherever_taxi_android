@@ -25,7 +25,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -118,13 +117,14 @@
 
         <LinearLayout
             android:id="@+id/layout_ride_accepted"
-            setRideAcceptedVisibility="@{viewModel.rideState}"
             setAcceptedRideData="@{viewModel.currentRideData}"
+            setRideAcceptedVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
-            android:paddingHorizontal="@dimen/medium_value"
-            android:layout_marginTop="@dimen/medium_value"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/medium_value"
             android:orientation="vertical"
+            android:paddingHorizontal="@dimen/medium_value"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -139,31 +139,31 @@
 
             <TextView
                 android:id="@+id/tv_driver_name"
-                tools:text = "Aliosa Popovici"
-                android:layout_marginTop="@dimen/medium_value"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_value"
+                tools:text="Aliosa Popovici" />
 
             <TextView
                 android:id="@+id/tv_driver_vehicle"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                tools:text = "Lamborghini"
-                android:layout_height="wrap_content" />
+                tools:text="Lamborghini" />
 
             <TextView
                 android:id="@+id/tv_driver_vehicle_class"
                 android:layout_width="wrap_content"
-                tools:text = "Comfort"
+                android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:layout_height="wrap_content" />
+                tools:text="Comfort" />
 
             <TextView
                 android:id="@+id/tv_driver_license_plate_number"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                tools:text = "Comfort"
-                android:layout_height="wrap_content" />
+                tools:text="Comfort" />
 
         </LinearLayout>
 
@@ -174,8 +174,8 @@
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/medium_value"
             android:gravity="center_horizontal"
-            android:visibility="gone"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -194,8 +194,68 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="@{()->viewModel.onRideCancel(viewModel.currentRideId)}"
                 android:text="@string/cancel_request"
                 android:textAllCaps="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_ride_completed"
+            setRideCompletedVisibility="@{viewModel.rideState}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/medium_value"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/ride_completed"
+                android:textColor="@color/black"
+                android:textSize="23sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/small_value"
+                android:gravity="center"
+                android:text="@string/rate_your_driver"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="@style/RatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/secondaryColor"
+                android:rating="3"
+                android:secondaryProgressTint="@color/white"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_constraintLeft_creator="1"
+                tools:layout_constraintRight_creator="1"
+                tools:layout_constraintTop_creator="1" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_value"
+                android:background="@drawable/bg_sign_in_btn"
+                android:backgroundTint="@color/secondaryColor"
+                android:onClick="@{()->viewModel.resetData()}"
+                android:text="@string/submit"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

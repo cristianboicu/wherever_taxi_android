@@ -42,6 +42,10 @@ class Repository @Inject constructor(private val remoteDataSource: IRemoteDataSo
         return remoteDataSource.logOutUser()
     }
 
+    override suspend fun cancelRide(rideId: String) {
+        return remoteDataSource.cancelRide(rideId)
+    }
+
     override suspend fun getDirection(origin: LatLng, destination: LatLng): String? {
         return try {
             val fromOrigin = origin.latitude.toString() + "," + origin.longitude.toString()

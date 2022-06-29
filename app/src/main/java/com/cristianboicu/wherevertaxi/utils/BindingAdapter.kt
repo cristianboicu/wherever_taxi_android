@@ -81,6 +81,14 @@ fun View.setRidePendingVisibility(state: RideState) {
         View.GONE
     }
 }
+@BindingAdapter("setRideCompletedVisibility")
+fun View.setRideCompletedVisibility(state: RideState) {
+    visibility = if (state == RideState.RIDE_COMPLETED) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}
 
 @BindingAdapter("setNavigationDrawerVisibility")
 fun View.setNavigationDrawerVisibility(state: RideState) {

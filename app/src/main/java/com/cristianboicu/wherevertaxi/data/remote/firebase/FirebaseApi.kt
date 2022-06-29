@@ -80,6 +80,13 @@ class FirebaseApi
         return database.child(ProjectConstants.COMPLETED_RIDES_PATH).child(rideId)
     }
 
+    override suspend fun cancelRide(rideId: String) {
+        try {
+            database.child(RIDE_REQUEST_PATH).child(rideId).removeValue().await()
+        } catch (e: Exception){
+        }
+    }
+
     override fun logOutUser(): Boolean {
         return try {
             firebaseAuth.signOut()
