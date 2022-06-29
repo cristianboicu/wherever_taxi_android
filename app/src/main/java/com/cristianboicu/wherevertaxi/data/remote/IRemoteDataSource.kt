@@ -1,10 +1,10 @@
 package com.cristianboicu.wherevertaxi.data.remote
 
-import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
+import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -13,7 +13,7 @@ interface IRemoteDataSource {
 
     fun getLoggedUserId(): FirebaseUser?
 
-    suspend fun getLoggedUserData(currentUser: FirebaseUser): User?
+    suspend fun getRemoteUser(uid: String): User?
 
     suspend fun listenAvailableDrivers(): DatabaseReference
 
@@ -43,6 +43,8 @@ interface IRemoteDataSource {
     suspend fun getAvailableDrivers(): List<Driver?>?
 
     suspend fun postRideRequest(
-        rideRequest: RideRequest
+        rideRequest: RideRequest,
     ): String?
+
+    suspend fun saveRemoteUser(uid: String, user: User)
 }

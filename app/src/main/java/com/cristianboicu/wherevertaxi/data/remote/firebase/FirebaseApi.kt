@@ -1,9 +1,9 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
 import android.util.Log
-import com.cristianboicu.wherevertaxi.data.model.User
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
+import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.RIDE_REQUEST_PATH
 import com.google.firebase.auth.FirebaseAuth
@@ -24,10 +24,14 @@ class FirebaseApi
         return firebaseAuth.currentUser
     }
 
-    override suspend fun getCurrentUserData(currentUser: FirebaseUser): User? {
+    override suspend fun saveRemoteUser(uid: String, user: User) {
+        database.child("users").child(uid).setValue(user)
+    }
+
+    override suspend fun getRemoteUser(uid: String): User? {
         return try {
             val res =
-                database.child(ProjectConstants.USERS_PATH).child(currentUser.uid).get().await()
+                database.child(ProjectConstants.USERS_PATH).child(uid).get().await()
             val fetchedUser = res.getValue(User::class.java)
             Log.d(TAG, "Got value $fetchedUser")
             fetchedUser
@@ -83,7 +87,7 @@ class FirebaseApi
     override suspend fun cancelRide(rideId: String) {
         try {
             database.child(RIDE_REQUEST_PATH).child(rideId).removeValue().await()
-        } catch (e: Exception){
+        } catch (e: Exception) {
         }
     }
 

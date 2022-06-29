@@ -11,7 +11,7 @@
 
         <variable
             name="user"
-            type="com.cristianboicu.wherevertaxi.data.model.User" />
+            type="com.cristianboicu.wherevertaxi.data.model.user.LocalUser" />
     </data>
 
     <LinearLayout

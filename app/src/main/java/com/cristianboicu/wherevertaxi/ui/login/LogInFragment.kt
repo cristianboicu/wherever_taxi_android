@@ -33,9 +33,6 @@ class LogInFragment : Fragment() {
 
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
         try {
             activityCallback = activity as SendVerificationCode
         } catch (e: ClassCastException) {
@@ -65,7 +62,6 @@ class LogInFragment : Fragment() {
             binding.editTextPhone.setText("+37368026689")
             binding.editTextPhone.text?.let { phoneNumber ->
                 if (phoneNumber.isNotEmpty() && phoneNumber.isNotBlank()) {
-//                    requestVerificationCode("+373 680 26 689")
                     requestVerificationCode(phoneNumber.toString())
                 } else {
                     Toast.makeText(context, "Provide a phone number", Toast.LENGTH_SHORT).show()
@@ -83,9 +79,9 @@ class LogInFragment : Fragment() {
             LogInFragmentDirections.actionLogInFragmentToHomeFragment()
         )
     }
-    fun navigateVerificationCode() {
+    fun navigateVerificationCode(phnb: String, verificationId: String) {
         this.findNavController().navigate(
-            LogInFragmentDirections.actionLogInFragmentToVerificationCodeFragment()
+            LogInFragmentDirections.actionLogInFragmentToVerificationCodeFragment(phnb, verificationId)
         )
     }
 }

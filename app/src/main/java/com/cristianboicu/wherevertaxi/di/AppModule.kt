@@ -2,7 +2,11 @@ package com.cristianboicu.wherevertaxi.di
 
 import android.content.Context
 import android.util.Log
-import com.cristianboicu.wherevertaxi.R
+import androidx.room.Room
+import com.cristianboicu.wherevertaxi.data.local.ILocalDataSource
+import com.cristianboicu.wherevertaxi.data.local.LocalDataSource
+import com.cristianboicu.wherevertaxi.data.local.TaxiDao
+import com.cristianboicu.wherevertaxi.data.local.TaxiDatabase
 import com.cristianboicu.wherevertaxi.data.remote.IRemoteDataSource
 import com.cristianboicu.wherevertaxi.data.remote.RemoteDataSource
 import com.cristianboicu.wherevertaxi.data.remote.cloud.*
@@ -37,6 +41,11 @@ abstract class AppModule {
     ): IRemoteDataSource
 
     @Binds
+    abstract fun bindLocalDataSource(
+        localDataSource: LocalDataSource,
+    ): ILocalDataSource
+
+    @Binds
     abstract fun bindFirebaseApi(
         firebaseApi: FirebaseApi,
     ): IFirebaseApi
@@ -57,6 +66,20 @@ abstract class AppModule {
     ): IRepository
 
     companion object {
+        @Singleton
+        @Provides
+        fun provideDatabase(
+            @ApplicationContext context: Context,
+        ) = Room.databaseBuilder(
+            context.applicationContext,
+            TaxiDatabase::class.java,
+            "user"
+        ).build()
+
+        @Singleton
+        @Provides
+        fun provideDao(db: TaxiDatabase) = db.getTaxiDao()
+
         @Provides
         @Singleton
         fun providePlacesApi(placesClient: PlacesClient): PlacesApi {
@@ -115,7 +138,14 @@ abstract class AppModule {
 
         @Singleton
         @Provides
-        fun provideRepository(remoteDataSource: RemoteDataSource) = Repository(remoteDataSource)
+        fun provideLocalDataSource(taxiDao: TaxiDao) = LocalDataSource(taxiDao)
+
+        @Singleton
+        @Provides
+        fun provideRepository(
+            remoteDataSource: RemoteDataSource,
+            localDataSource: LocalDataSource,
+        ) = Repository(remoteDataSource, localDataSource)
     }
 
 }

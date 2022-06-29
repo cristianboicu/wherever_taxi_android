@@ -6,14 +6,15 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.cristianboicu.wherevertaxi.R
-import com.cristianboicu.wherevertaxi.data.model.User
+import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
+import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 import com.cristianboicu.wherevertaxi.ui.main.RideState
 
 @SuppressLint("SetTextI18n")
 @BindingAdapter("userName")
-fun TextView.setUserName(user: User?) {
+fun TextView.setUserName(user: LocalUser?) {
     user?.let {
         var temp = ""
         if (!it.fname.isNullOrEmpty()) {
@@ -30,14 +31,14 @@ fun TextView.setUserName(user: User?) {
 }
 
 @BindingAdapter("userPhone")
-fun TextView.setUserPhone(user: User?) {
+fun TextView.setUserPhone(user: LocalUser?) {
     user?.let {
         text = it.phone
     }
 }
 
 @BindingAdapter("userEmail")
-fun TextView.setUserEmail(user: User?) {
+fun TextView.setUserEmail(user: LocalUser?) {
     user?.let {
         text = if (!it.email.isNullOrEmpty()) {
             "${it.email}"

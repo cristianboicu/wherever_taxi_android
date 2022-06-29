@@ -1,4 +1,4 @@
-package com.cristianboicu.wherevertaxi.data.model
+package com.cristianboicu.wherevertaxi.data.model.user
 
 import java.io.Serializable
 

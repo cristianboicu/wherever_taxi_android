@@ -2,7 +2,7 @@ package com.cristianboicu.wherevertaxi.data.remote
 
 import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
-import com.cristianboicu.wherevertaxi.data.model.User
+import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
@@ -23,8 +23,8 @@ class RemoteDataSource @Inject constructor(
         return firebaseApi.getCurrentUser()
     }
 
-    override suspend fun getLoggedUserData(currentUser: FirebaseUser): User? {
-        val res = firebaseApi.getCurrentUserData(currentUser)
+    override suspend fun getRemoteUser(uid: String): User? {
+        val res = firebaseApi.getRemoteUser(uid)
         Log.d("RemoteDataSource", "Got value $res")
         return res
     }
@@ -89,5 +89,9 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun postRideRequest(rideRequest: RideRequest): String? {
         return firebaseApi.postRideRequest(rideRequest)
+    }
+
+    override suspend fun saveRemoteUser(uid: String, user: User) {
+        return firebaseApi.saveRemoteUser(uid, user)
     }
 }

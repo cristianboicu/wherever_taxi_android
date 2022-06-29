@@ -9,7 +9,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 object Util {
-    fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
+    private fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
         val width = bm.width
         val height = bm.height
         val scaleWidth = newWidth.toFloat() / width
