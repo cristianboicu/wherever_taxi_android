@@ -262,8 +262,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
-
     private fun listenAvailableDrivers() {
         viewModelScope.launch {
             dbAvailableDriversListener = repository.listenAvailableDrivers()
