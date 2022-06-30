@@ -6,8 +6,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.cristianboicu.wherevertaxi.R
-import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 import com.cristianboicu.wherevertaxi.ui.main.RideState
@@ -74,6 +74,7 @@ fun View.setRideAcceptedVisibility(state: RideState) {
         View.GONE
     }
 }
+
 @BindingAdapter("setRidePendingVisibility")
 fun View.setRidePendingVisibility(state: RideState) {
     visibility = if (state == RideState.RIDE_PENDING) {
@@ -82,6 +83,7 @@ fun View.setRidePendingVisibility(state: RideState) {
         View.GONE
     }
 }
+
 @BindingAdapter("setRideCompletedVisibility")
 fun View.setRideCompletedVisibility(state: RideState) {
     visibility = if (state == RideState.RIDE_COMPLETED) {
@@ -140,6 +142,18 @@ fun View.setAcceptedRideData(ongoingRideData: OngoingRideData?) {
         findViewById<TextView>(R.id.tv_driver_name).text = ongoingRideData.driverName
         findViewById<TextView>(R.id.tv_driver_vehicle).text = ongoingRideData.vehicle
         findViewById<TextView>(R.id.tv_driver_vehicle_class).text = ongoingRideData.vehicleClass
-        findViewById<TextView>(R.id.tv_driver_license_plate_number).text = ongoingRideData.licensePlateNumber
+        findViewById<TextView>(R.id.tv_driver_license_plate_number).text =
+            ongoingRideData.licensePlateNumber
+    }
+}
+
+@SuppressLint("SetTextI18n")
+@BindingAdapter("setHistoryRideData")
+fun View.setHistoryRideData(completedRide: CompletedRide?) {
+    completedRide?.let {
+        findViewById<TextView>(R.id.tv_ride_destination).text = completedRide.destinationPlain
+        findViewById<TextView>(R.id.tv_ride_date_time).text =
+            "${completedRide.date} ${completedRide.time}"
+        findViewById<TextView>(R.id.tv_ride_price).text = completedRide.price.toString()
     }
 }

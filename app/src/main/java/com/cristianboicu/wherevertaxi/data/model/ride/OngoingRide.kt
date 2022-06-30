@@ -14,6 +14,8 @@ data class OngoingRideData(
     val driverLocation: GeogLocation? = null,
     val driverName: String? = null,
     val clientName: String? = null,
+    val originPlain: String? = null,
+    val destinationPlain: String? = null,
     val vehicle: String? = null,
     val licensePlateNumber: String? = null,
     val originLocation: GeogLocation? = null,

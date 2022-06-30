@@ -36,9 +36,6 @@
         <action
             android:id="@+id/action_profileFragment_to_editUserDataFragment"
             app:destination="@id/editUserDataFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_rideHistoryFragment"
-            app:destination="@id/rideHistoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/verificationCodeFragment"
@@ -85,5 +82,9 @@
     <fragment
         android:id="@+id/rideHistoryFragment"
         android:name="com.cristianboicu.wherevertaxi.ui.rideHistory.RideHistoryFragment"
-        android:label="RideHistoryFragment" />
+        android:label="RideHistoryFragment" >
+        <action
+            android:id="@+id/action_rideHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>

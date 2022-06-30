@@ -2,6 +2,7 @@ package com.cristianboicu.wherevertaxi.data.remote
 
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.model.user.User
@@ -19,7 +20,7 @@ interface IRemoteDataSource {
 
     suspend fun listenToRequestedRide(rideId: String): DatabaseReference
 
-    suspend fun listenToCompletedRide(rideId: String): DatabaseReference
+    suspend fun listenToCompletedRide(uid: String, rideId: String): DatabaseReference
 
     suspend fun cancelRide(rideId: String)
 
@@ -35,8 +36,13 @@ interface IRemoteDataSource {
 
     suspend fun getGeocoding(
         place_id: String,
-        apiKey: String,
     ): GeocodingResponse?
+
+    suspend fun getReverseGeocoding(
+        placeLatLng: String,
+    ): String?
+
+    suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?>
 
     suspend fun getPredictions(query: String): MutableList<AutocompletePrediction>
 

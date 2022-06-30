@@ -13,8 +13,11 @@ interface ICloudServiceApi {
     ): Response<DirectionResponses>
 
     suspend fun getGeocoding(
-        place_id: String,
-        apiKey: String,
+        placeId: String,
+    ): Response<GeocodingResponse>
+
+    suspend fun getReverseGeocoding(
+        placeLatLng: String,
     ): Response<GeocodingResponse>
 
     suspend fun getPredictions(query: String): MutableList<AutocompletePrediction>

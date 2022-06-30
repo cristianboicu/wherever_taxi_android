@@ -3,6 +3,7 @@ package com.cristianboicu.wherevertaxi.data.repository
 import androidx.lifecycle.LiveData
 import com.cristianboicu.wherevertaxi.data.local.ILocalDataSource
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 import com.cristianboicu.wherevertaxi.data.model.user.User
@@ -101,6 +102,10 @@ class Repository @Inject constructor(
         return localDataSource.saveLocalUser(localUser)
     }
 
+    override suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?> {
+        return remoteDataSource.getCompletedRidesByUserId(uid)
+    }
+
     override suspend fun postRideRequest(rideRequest: RideRequest): String? {
         return remoteDataSource.postRideRequest(rideRequest)
     }
@@ -128,8 +133,17 @@ class Repository @Inject constructor(
         return remoteDataSource.getPredictions(query)
     }
 
-    override suspend fun getGeocoding(place_id: String, apiKey: String): GeocodingResponse? {
-        return remoteDataSource.getGeocoding(place_id, apiKey)
+    override suspend fun getGeocoding(place_id: String): GeocodingResponse? {
+        return remoteDataSource.getGeocoding(place_id)
+    }
+
+    override suspend fun getReverseGeocoding(placeLatLng: LatLng): String {
+        val latLng = "${placeLatLng.latitude},${placeLatLng.longitude}"
+        var res = remoteDataSource.getReverseGeocoding(latLng)
+        if (res == null) {
+            res = "Address not found"
+        }
+        return res
     }
 
     override suspend fun listenAvailableDrivers(): DatabaseReference {
@@ -141,6 +155,7 @@ class Repository @Inject constructor(
     }
 
     override suspend fun listenToCompletedRide(rideId: String): DatabaseReference {
-        return remoteDataSource.listenToCompletedRide(rideId)
+        val tempUid = getAuthenticatedUserId()!!
+        return remoteDataSource.listenToCompletedRide(tempUid, rideId)
     }
 }

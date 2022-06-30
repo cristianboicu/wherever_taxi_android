@@ -6,12 +6,14 @@
     <data>
     <variable
         name="ride"
-        type="com.cristianboicu.wherevertaxi.data.model.ride.LocalRide" />
+        type="com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/ride_history_item"
+        app:setHistoryRideData="@{ride}"
         android:paddingHorizontal="@dimen/medium_value"
         android:paddingVertical="@dimen/small_value">
 

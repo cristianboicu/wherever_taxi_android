@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.cristianboicu.wherevertaxi.data.model.ride.LocalRide
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.databinding.ItemRideHistoryBinding
 
 class RideHistoryAdapter :
-    ListAdapter<LocalRide, RideHistoryViewHolder>(RideHistoryDiffCallback()) {
+    ListAdapter<CompletedRide, RideHistoryViewHolder>(RideHistoryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RideHistoryViewHolder {
         return RideHistoryViewHolder.from(parent)
@@ -25,7 +25,7 @@ class RideHistoryViewHolder private constructor(private val binding: ItemRideHis
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
-        item: LocalRide,
+        item: CompletedRide,
     ) {
         binding.ride = item
         binding.executePendingBindings()
@@ -40,17 +40,17 @@ class RideHistoryViewHolder private constructor(private val binding: ItemRideHis
     }
 }
 
-class RideHistoryDiffCallback : DiffUtil.ItemCallback<LocalRide>() {
+class RideHistoryDiffCallback : DiffUtil.ItemCallback<CompletedRide>() {
     override fun areItemsTheSame(
-        oldItem: LocalRide,
-        newItem: LocalRide,
+        oldItem: CompletedRide,
+        newItem: CompletedRide,
     ): Boolean {
         return oldItem.rideId == newItem.rideId
     }
 
     override fun areContentsTheSame(
-        oldItem: LocalRide,
-        newItem: LocalRide,
+        oldItem: CompletedRide,
+        newItem: CompletedRide,
     ): Boolean {
         return oldItem.rideId == newItem.rideId
     }

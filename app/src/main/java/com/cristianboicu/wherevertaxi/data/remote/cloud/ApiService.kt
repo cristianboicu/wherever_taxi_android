@@ -2,6 +2,7 @@ package com.cristianboicu.wherevertaxi.data.remote.cloud
 
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import retrofit2.Call
 import retrofit2.Response
@@ -19,6 +20,12 @@ interface ApiService {
     @GET("maps/api/geocode/json")
     suspend fun getGeocoding(
         @Query("place_id") place_id: String,
+        @Query("key") apiKey: String,
+    ): Response<GeocodingResponse>
+
+    @GET("maps/api/geocode/json")
+    suspend fun getReverseGeocoding(
+        @Query("latlng") placeLatLng: String,
         @Query("key") apiKey: String,
     ): Response<GeocodingResponse>
 }

@@ -5,6 +5,7 @@ import com.cristianboicu.wherevertaxi.BuildConfig
 object ProjectConstants {
     const val DATABASE_URL = "https://wherever-taxi-default-rtdb.europe-west1.firebasedatabase.app/"
     const val USERS_PATH = "users"
+    const val COMPLETED_RIDES = "completedRides"
     const val DRIVERS_PATH = "drivers"
     const val AVAILABLE_DRIVERS_PATH = "availableDrivers"
     const val RIDE_REQUEST_PATH = "rideRequests"

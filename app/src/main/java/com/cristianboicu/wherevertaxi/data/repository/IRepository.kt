@@ -2,6 +2,7 @@ package com.cristianboicu.wherevertaxi.data.repository
 
 import androidx.lifecycle.LiveData
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 import com.cristianboicu.wherevertaxi.data.model.user.User
@@ -29,8 +30,11 @@ interface IRepository {
 
     suspend fun getGeocoding(
         place_id: String,
-        apiKey: String,
     ): GeocodingResponse?
+
+    suspend fun getReverseGeocoding(
+        placeLatLng: LatLng,
+    ): String
 
     suspend fun listenAvailableDrivers(): DatabaseReference
 
@@ -52,4 +56,5 @@ interface IRepository {
 
     suspend fun saveLocalUser(localUser: LocalUser)
 
+    suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?>
 }

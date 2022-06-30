@@ -1,8 +1,9 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
-import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
+import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 
@@ -21,13 +22,15 @@ interface IFirebaseApi {
 
     suspend fun listenToRequestedRide(rideId: String): DatabaseReference
 
-    suspend fun listenToCompletedRide(rideId: String): DatabaseReference
+    suspend fun listenToCompletedRide(uid: String, rideId: String): DatabaseReference
+
+    suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?>
 
     suspend fun cancelRide(rideId: String)
 
     fun logOutUser(): Boolean
 
     suspend fun postRideRequest(
-        rideRequest: RideRequest
+        rideRequest: RideRequest,
     ): String?
 }

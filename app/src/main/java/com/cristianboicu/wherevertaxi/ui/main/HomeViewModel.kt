@@ -15,7 +15,6 @@ import com.cristianboicu.wherevertaxi.data.model.ride.toLatLng
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.databinding.ItemCarBinding
 import com.cristianboicu.wherevertaxi.utils.Event
-import com.cristianboicu.wherevertaxi.utils.ProjectConstants.API_KEY
 import com.cristianboicu.wherevertaxi.utils.Util.getBitmapFromSvg
 import com.cristianboicu.wherevertaxi.utils.Util.getCurrentDate
 import com.cristianboicu.wherevertaxi.utils.Util.getCurrentTime
@@ -30,6 +29,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -120,6 +120,7 @@ class HomeViewModel @Inject constructor(
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             viewModelScope.launch {
                 if (dataSnapshot.exists()) {
+                    Log.d(TAG, "ongoing listener")
                     val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
                     ongoingRide?.driverLocation?.let {
                         _driverLocation.postValue(it.toLatLng())
@@ -165,37 +166,52 @@ class HomeViewModel @Inject constructor(
         if (comfortCar) {
             vehicleClass = "Comfort"
         }
-        requestRide(origin.value, destination.value, userId, vehicleClass)
+        viewModelScope.launch {
+            var originPlainText = async { repository.getReverseGeocoding(origin.value!!) }
+            val destinationPlainText = async { repository.getReverseGeocoding(destination.value!!) }
+
+            val temp = createRideRequest(
+                userId!!,
+                origin.value!!,
+                originPlainText.await(),
+                destination.value!!,
+                destinationPlainText.await(),
+                vehicleClass
+            )
+            requestRide(temp)
+        }
+    }
+
+    private fun createRideRequest(
+        uid: String,
+        origin: LatLng,
+        originPlain: String,
+        destination: LatLng,
+        destinationPlain: String,
+        vehicleClass: String,
+    ): RideRequest {
+        return RideRequest(
+            uid = uid,
+            originLocation = GeoLocation(origin.latitude, origin.longitude),
+            destinationLocation = GeoLocation(destination.latitude,
+                destination.longitude),
+            originPlain = originPlain,
+            destinationPlain = destinationPlain,
+            vehicleClass = vehicleClass,
+            date = getCurrentDate(),
+            time = getCurrentTime(),
+            price = 15.8,
+            payment = "Cash"
+        )
     }
 
     private fun requestRide(
-        origin: LatLng?,
-        destination: LatLng?,
-        uid: String?,
-        vehicleClass: String,
+        rideRequest: RideRequest,
     ) {
-        val drivers = availableDrivers.value?.toList()
-        val driverLocation = drivers?.get(1)?.second?.currentLocation
-
-        if (driverLocation != null && origin != null) {
-            viewModelScope.launch {
-                _rideState.value = RideState.SELECT_CAR
-                val rideRequest =
-                    RideRequest(
-                        uid = uid!!,
-                        originLocation = GeoLocation(origin.latitude, origin.longitude),
-                        destinationLocation = GeoLocation(destination!!.latitude,
-                            destination.longitude),
-                        vehicleClass = vehicleClass,
-                        date = getCurrentDate(),
-                        time = getCurrentTime(),
-                        price = 15.8,
-                        payment = "Cash"
-                    )
-                val key = repository.postRideRequest(rideRequest)
-                key?.let {
-                    listenToRequestedRide(it)
-                }
+        viewModelScope.launch {
+            val key = repository.postRideRequest(rideRequest)
+            key?.let {
+                listenToRequestedRide(it)
             }
         }
     }
@@ -230,9 +246,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onRideCompleted(rideId: String) {
-        dbReferenceListener.removeEventListener(rideOngoingListener)
-        dbCompletedRidesListener.removeEventListener(rideCompletionListener)
-        _rideState.value = RideState.RIDE_COMPLETED
+        viewModelScope.launch {
+            dbReferenceListener.removeEventListener(rideOngoingListener)
+            dbCompletedRidesListener.removeEventListener(rideCompletionListener)
+            _rideState.value = RideState.RIDE_COMPLETED
+        }
     }
 
     fun resetData() {
@@ -246,7 +264,7 @@ class HomeViewModel @Inject constructor(
     fun onDestinationSelected(destinationId: String) {
         viewModelScope.launch {
             val destinationLatLng =
-                repository.getGeocoding(destinationId, API_KEY)
+                repository.getGeocoding(destinationId)
 
             destinationLatLng?.let {
                 destination.value = LatLng(it.results[0].geometry.location.lat,

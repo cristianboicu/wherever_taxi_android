@@ -2,6 +2,7 @@ package com.cristianboicu.wherevertaxi.data.remote.firebase
 
 import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
@@ -38,6 +39,23 @@ class FirebaseApi
         } catch (e: Exception) {
             Log.d(TAG, "Error getting data ${e.message}")
             null
+        }
+    }
+
+    override suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?> {
+        val completedRides = mutableListOf<CompletedRide?>()
+        return try {
+            val res = database.child(ProjectConstants.COMPLETED_RIDES_PATH).child(uid).get().await()
+
+            for (ride in res.children) {
+                val completedRide = ride.getValue(CompletedRide::class.java)
+                completedRide?.rideId = ride.key
+                completedRides.add(completedRide)
+            }
+            Log.d(TAG, "Got value ${completedRides.toString()}")
+            completedRides
+        } catch (e: Exception) {
+            completedRides
         }
     }
 
@@ -80,8 +98,8 @@ class FirebaseApi
         return database.child(ProjectConstants.ONGOING_RIDES_PATH).child(rideId)
     }
 
-    override suspend fun listenToCompletedRide(rideId: String): DatabaseReference {
-        return database.child(ProjectConstants.COMPLETED_RIDES_PATH).child(rideId)
+    override suspend fun listenToCompletedRide(uid: String, rideId: String): DatabaseReference {
+        return database.child(ProjectConstants.COMPLETED_RIDES_PATH).child(uid).child(rideId)
     }
 
     override suspend fun cancelRide(rideId: String) {

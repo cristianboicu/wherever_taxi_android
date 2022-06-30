@@ -2,6 +2,8 @@ package com.cristianboicu.wherevertaxi.data.remote.cloud
 
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import retrofit2.Response
 import javax.inject.Inject
@@ -11,6 +13,7 @@ class CloudServiceApi @Inject constructor(
     private val placesApi: IPlacesApi,
 ) : ICloudServiceApi {
 
+    //use project constants for api_key
     override suspend fun getDirection(
         origin: String,
         destination: String,
@@ -20,10 +23,15 @@ class CloudServiceApi @Inject constructor(
     }
 
     override suspend fun getGeocoding(
-        place_id: String,
-        apiKey: String,
+        placeId: String,
     ): Response<GeocodingResponse> {
-        return apiService.getGeocoding(place_id, apiKey)
+        return apiService.getGeocoding(placeId, ProjectConstants.API_KEY)
+    }
+
+    override suspend fun getReverseGeocoding(
+        placeLatLng: String,
+    ): Response<GeocodingResponse> {
+        return apiService.getReverseGeocoding(placeLatLng, ProjectConstants.API_KEY)
     }
 
 

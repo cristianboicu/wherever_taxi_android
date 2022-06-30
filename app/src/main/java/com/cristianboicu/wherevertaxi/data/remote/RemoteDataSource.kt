@@ -4,6 +4,7 @@ import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.remote.cloud.ICloudServiceApi
@@ -37,8 +38,8 @@ class RemoteDataSource @Inject constructor(
         return firebaseApi.listenToRequestedRide(rideId)
     }
 
-    override suspend fun listenToCompletedRide(rideId: String): DatabaseReference {
-        return firebaseApi.listenToCompletedRide(rideId)
+    override suspend fun listenToCompletedRide(uid:String, rideId: String): DatabaseReference {
+        return firebaseApi.listenToCompletedRide(uid, rideId)
     }
 
     override suspend fun cancelRide(rideId: String) {
@@ -68,15 +69,32 @@ class RemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getGeocoding(place_id: String, apiKey: String): GeocodingResponse? {
+    //to do return just latLng
+    override suspend fun getGeocoding(place_id: String): GeocodingResponse? {
         return try {
-            val res = cloudServiceApi.getGeocoding(place_id, apiKey)
+            val res = cloudServiceApi.getGeocoding(place_id)
             Log.d("RemoteDataSource", "Got geocoding $res")
             res.body()
         } catch (e: Exception) {
             Log.d("RemoteDataSource", "Got geocoding error")
             null
         }
+    }
+
+    override suspend fun getReverseGeocoding(placeLatLng: String): String? {
+        return try {
+            val res = cloudServiceApi.getReverseGeocoding(placeLatLng)
+            res.body()?.let {
+                return it.results[0].formattedAddress
+            }
+        } catch (e: Exception) {
+            Log.d("RemoteDataSource", "Got geocoding error")
+            null
+        }
+    }
+
+    override suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?> {
+        return firebaseApi.getCompletedRidesByUserId(uid)
     }
 
     override suspend fun getPredictions(query: String): MutableList<AutocompletePrediction> {
