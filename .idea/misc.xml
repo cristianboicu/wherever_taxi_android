@@ -30,6 +30,7 @@
         <entry key="app/src/main/res/layout/fragment_verification_code.xml" value="0.18823977739383013" />
         <entry key="app/src/main/res/layout/item_car.xml" value="0.21150054931640627" />
         <entry key="app/src/main/res/layout/item_place.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/layout/item_ride_history.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/menu/drawer_view.xml" value="0.1" />
       </map>
     </option>

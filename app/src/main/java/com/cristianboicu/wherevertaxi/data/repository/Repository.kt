@@ -1,6 +1,5 @@
 package com.cristianboicu.wherevertaxi.data.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.cristianboicu.wherevertaxi.data.local.ILocalDataSource
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
@@ -43,19 +42,22 @@ class Repository @Inject constructor(
 
     override suspend fun refreshAuthenticatedUser() {
         var authenticatedUser: User?
-        val remoteFirebaseUser = remoteDataSource.getLoggedUserId()
+        try {
+            val remoteFirebaseUser = remoteDataSource.getLoggedUserId()
 
-        remoteFirebaseUser?.let { remoteFirebaseUser ->
-            authenticatedUser = remoteDataSource.getRemoteUser(remoteFirebaseUser.uid)
+            remoteFirebaseUser?.let { remoteFirebaseUser ->
+                authenticatedUser = remoteDataSource.getRemoteUser(remoteFirebaseUser.uid)
 
-            authenticatedUser?.let {
-                Log.d("Profile", "save fucking user ${authenticatedUser.toString()}")
-                saveLocalUser(LocalUser(remoteFirebaseUser.uid,
-                    it.fname,
-                    it.sname,
-                    it.phone,
-                    it.email))
+                authenticatedUser?.let {
+                    saveLocalUser(LocalUser(remoteFirebaseUser.uid,
+                        it.fname,
+                        it.sname,
+                        it.phone,
+                        it.email))
+                }
             }
+        } catch (e: Exception) {
+
         }
     }
 

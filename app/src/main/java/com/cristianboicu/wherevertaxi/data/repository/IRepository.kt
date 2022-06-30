@@ -51,4 +51,5 @@ interface IRepository {
     suspend fun deleteLocalUser(uid: String)
 
     suspend fun saveLocalUser(localUser: LocalUser)
+
 }

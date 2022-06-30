@@ -28,4 +28,5 @@
     <string name="submit">Submit</string>
     <string name="rate_your_ride">Rate your ride</string>
     <string name="rate_your_driver">Rate your driver</string>
+    <string name="my_rides">My Rides</string>
 </resources>

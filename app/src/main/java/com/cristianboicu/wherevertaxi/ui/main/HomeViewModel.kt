@@ -298,8 +298,8 @@ class HomeViewModel @Inject constructor(
 
 enum class RideState {
     SELECT_DESTINATION,
-    RIDE_PENDING,
     SELECT_CAR,
+    RIDE_PENDING,
     RIDE_ACCEPTED,
     RIDE_COMPLETED
 }

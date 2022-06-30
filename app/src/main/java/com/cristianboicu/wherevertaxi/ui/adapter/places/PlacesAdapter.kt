@@ -16,8 +16,8 @@ class PlacesAdapter(private val clickListener: PlacesListener) :
     }
 
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
-        val repository = getItem(position)
-        holder.bind(repository, clickListener)
+        val place = getItem(position)
+        holder.bind(place, clickListener)
     }
 
 }
