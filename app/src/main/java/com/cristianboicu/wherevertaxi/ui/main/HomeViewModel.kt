@@ -120,7 +120,7 @@ class HomeViewModel @Inject constructor(
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             viewModelScope.launch {
                 if (dataSnapshot.exists()) {
-                    Log.d(TAG, "ongoing listener")
+                    Log.d(TAG, "ongoing ride listener")
                     val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
                     ongoingRide?.driverLocation?.let {
                         _driverLocation.postValue(it.toLatLng())
@@ -152,6 +152,7 @@ class HomeViewModel @Inject constructor(
     init {
         updateUserCurrentLocation()
         listenAvailableDrivers()
+        Log.d(TAG, "init vm${_clientToDestinationPath.value}")
         _rideState.value = RideState.SELECT_DESTINATION
     }
 
@@ -218,6 +219,7 @@ class HomeViewModel @Inject constructor(
 
     private fun listenToRequestedRide(rideId: String) {
         viewModelScope.launch {
+            Log.d("HomeViewModel", "we are pending ride")
             currentRideId = rideId
             _rideState.value = RideState.RIDE_PENDING
             dbReferenceListener = repository.listenToRequestedRide(rideId)
@@ -254,6 +256,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun resetData() {
+        Log.d(TAG, "reset data")
         currentRideId = null
         _clientToDestinationPath.value = null
         _clearMap.value = Event(Unit)

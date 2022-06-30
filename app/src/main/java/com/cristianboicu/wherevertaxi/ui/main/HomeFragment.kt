@@ -58,16 +58,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
+    private val TAG = "HomeFragment"
     private lateinit var map: GoogleMap
     private lateinit var drawer: DrawerLayout
-    private val TAG = "HomeFragment"
     private lateinit var mBottomSheetLayout: ConstraintLayout
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
     lateinit var viewModel: HomeViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var mCurrentLocation: Location
     private lateinit var adapter: PlacesAdapter
-
+    private var mCurrentLocation: LatLng? = null
     private val listOfDrivers = mutableListOf<Marker>()
     private var clientTripPath: Polyline? = null
     private var clientTripDestinationMarker: Marker? = null
@@ -83,7 +82,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(this.requireActivity())
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        viewModel = ViewModelProvider(this.requireActivity())[HomeViewModel::class.java]
+        Log.d("HomeFragment", "on createView")
 
         binding.viewModel = viewModel
         binding.bottomSheet.viewModel = viewModel
@@ -94,7 +94,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         binding.bottomSheet.rvAutocomplete.adapter = adapter
 
         setUpUi(binding, savedInstanceState)
-        setUpObserver()
+
+        requestCurrentLocation()
 
         return binding.root
     }
@@ -135,7 +136,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
-        viewModel.availableDriverMarkers.observe(viewLifecycleOwner) {
+        viewModel.availableDriverMarkers.observe(viewLifecycleOwner){
             for (driver in listOfDrivers) {
                 driver.remove()
             }
@@ -157,16 +158,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         }
 
         viewModel.requestCurrentLocation.observe(viewLifecycleOwner, EventObserver {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    location?.let {
-                        viewModel.origin.value = LatLng(it.latitude, it.longitude)
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude,
-                            it.longitude),
-                            15f))
-                    }
-                }
+            requestCurrentLocation()
         })
+    }
+
+    private fun requestCurrentLocation() {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let {
+                    viewModel.origin.value = LatLng(it.latitude, it.longitude)
+                    mCurrentLocation = LatLng(it.latitude, it.longitude)
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude,
+                        it.longitude),
+                        15f))
+                }
+            }
     }
 
 
@@ -230,6 +236,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         googleMap.setOnMyLocationButtonClickListener(this)
         googleMap.setOnMyLocationClickListener(this)
         enableMyLocation()
+        setUpObserver()
     }
 
     @SuppressLint("MissingPermission")
@@ -268,14 +275,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     override fun onMyLocationButtonClick(): Boolean {
         Toast.makeText(context, "MyLocation button clicked", Toast.LENGTH_SHORT)
             .show()
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
         return false
     }
 
     override fun onMyLocationClick(location: Location) {
         Toast.makeText(context, "Current location:\n$location", Toast.LENGTH_LONG)
             .show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "fragment destroyed")
     }
 }
 //

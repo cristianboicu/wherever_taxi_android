@@ -24,9 +24,9 @@ class RideHistoryFragment : Fragment() {
     ): View {
         val binding: FragmentRideHistoryBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_ride_history, container, false)
+        binding.lifecycleOwner = this
         viewModel = ViewModelProvider(this)[RideHistoryViewModel::class.java]
 
-        binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
         adapter = RideHistoryAdapter()

@@ -85,6 +85,8 @@
         android:label="RideHistoryFragment" >
         <action
             android:id="@+id/action_rideHistoryFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 </navigation>
