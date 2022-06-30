@@ -100,7 +100,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return binding.root
     }
 
-    @SuppressLint("MissingPermission")
     private fun setUpObserver() {
 
         viewModel.driverLocation.observe(viewLifecycleOwner) { it ->
@@ -162,6 +161,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         })
     }
 
+    @SuppressLint("MissingPermission")
     private fun requestCurrentLocation() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
