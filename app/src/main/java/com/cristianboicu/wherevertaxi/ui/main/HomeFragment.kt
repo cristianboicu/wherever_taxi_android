@@ -3,6 +3,7 @@ package com.cristianboicu.wherevertaxi.ui.main
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -71,6 +72,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private var clientTripPath: Polyline? = null
     private var clientTripDestinationMarker: Marker? = null
     private var driverMarker: Marker? = null
+    private lateinit var resizedBitmapIcon: Bitmap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,7 +89,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         binding.viewModel = viewModel
         binding.bottomSheet.viewModel = viewModel
-
+        resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)!!
         adapter = PlacesAdapter(PlacesListener {
             viewModel.onDestinationSelected(it)
         })
@@ -101,10 +103,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     }
 
     private fun setUpObserver() {
-
         viewModel.driverLocation.observe(viewLifecycleOwner, EventObserver { it ->
             Log.d("HomeFragment driver location", it.toString())
-            val resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)
 
             for (driver in listOfDrivers) {
                 driver.remove()
@@ -113,11 +113,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             if (driverMarker == null) {
                 driverMarker = map.addMarker(
                     MarkerOptions()
-                        .position(it).icon(resizedBitmapIcon?.let {
+                        .position(it).icon(resizedBitmapIcon.let {
                             BitmapDescriptorFactory.fromBitmap(it)
                         }))
+
             }
-            MarkerAnimation().animateMarkerToICS(driverMarker, it)
+
+            MarkerAnimation.animateMarkerToICS(driverMarker, it)
         })
 
         viewModel.clientToDestinationPath.observe(viewLifecycleOwner) {
@@ -135,7 +137,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
-        viewModel.availableDriverMarkers.observe(viewLifecycleOwner){
+        viewModel.availableDriverMarkers.observe(viewLifecycleOwner) {
             for (driver in listOfDrivers) {
                 driver.remove()
             }

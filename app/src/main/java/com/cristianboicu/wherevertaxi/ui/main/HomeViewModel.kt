@@ -271,6 +271,7 @@ class HomeViewModel @Inject constructor(
                 repository.getGeocoding(destinationId)
 
             destinationLatLng?.let {
+                _rideState.value = RideState.SELECT_CAR
                 destination.value = LatLng(it.results[0].geometry.location.lat,
                     it.results[0].geometry.location.lng)
                 updateUserCurrentLocation()
@@ -279,7 +280,6 @@ class HomeViewModel @Inject constructor(
                     repository.getDirection(origin.value!!,
                         destination.value!!)
 
-                _rideState.value = RideState.SELECT_CAR
             }
         }
     }
