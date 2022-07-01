@@ -154,6 +154,6 @@ fun View.setHistoryRideData(completedRide: CompletedRide?) {
         findViewById<TextView>(R.id.tv_ride_destination).text = completedRide.destinationPlain
         findViewById<TextView>(R.id.tv_ride_date_time).text =
             "${completedRide.date} ${completedRide.time}"
-        findViewById<TextView>(R.id.tv_ride_price).text = completedRide.price.toString()
+        findViewById<TextView>(R.id.tv_ride_price).text = "LEI " + completedRide.price.toString()
     }
 }

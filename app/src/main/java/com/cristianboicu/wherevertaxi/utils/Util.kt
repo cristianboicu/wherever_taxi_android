@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.roundToInt
 
 object Util {
     private fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
@@ -30,6 +31,12 @@ object Util {
         val bitmapIcon =
             BitmapFactory.decodeResource(context?.resources, id)
         return getResizedBitmap(bitmapIcon, 56, 56)
+    }
+
+    fun getRandom(min: Int, max: Int): Double {
+        require(min < max) { "Invalid range [$min, $max]" }
+        val random = min + Math.random() * (max - min)
+        return (random * 100.0).roundToInt() / 100.0
     }
 
     fun isValidEmail(email: CharSequence): Boolean {

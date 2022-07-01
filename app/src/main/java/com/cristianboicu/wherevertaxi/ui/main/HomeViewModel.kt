@@ -18,6 +18,7 @@ import com.cristianboicu.wherevertaxi.utils.Event
 import com.cristianboicu.wherevertaxi.utils.Util.getBitmapFromSvg
 import com.cristianboicu.wherevertaxi.utils.Util.getCurrentDate
 import com.cristianboicu.wherevertaxi.utils.Util.getCurrentTime
+import com.cristianboicu.wherevertaxi.utils.Util.getRandom
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -60,7 +61,7 @@ class HomeViewModel @Inject constructor(
     private val _availableDrivers = MutableLiveData<HashMap<String, AvailableDriver>?>()
     val availableDrivers = _availableDrivers
 
-    private val _driverLocation = MutableLiveData<LatLng>()
+    private val _driverLocation = MutableLiveData<Event<LatLng>>()
     val driverLocation = _driverLocation
 
     private val _clientToDestinationPath = MutableLiveData<String?>()
@@ -123,7 +124,7 @@ class HomeViewModel @Inject constructor(
                     Log.d(TAG, "ongoing ride listener")
                     val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
                     ongoingRide?.driverLocation?.let {
-                        _driverLocation.postValue(it.toLatLng())
+                        _driverLocation.postValue(Event(it.toLatLng()))
                         Log.d(TAG, "driver lcoation ${_driverLocation.value}")
                     }
                 }
@@ -201,7 +202,7 @@ class HomeViewModel @Inject constructor(
             vehicleClass = vehicleClass,
             date = getCurrentDate(),
             time = getCurrentTime(),
-            price = 15.8,
+            price =  getRandom(10, 30),
             payment = "Cash"
         )
     }

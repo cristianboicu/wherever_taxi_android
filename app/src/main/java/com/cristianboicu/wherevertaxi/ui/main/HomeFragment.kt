@@ -102,7 +102,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     private fun setUpObserver() {
 
-        viewModel.driverLocation.observe(viewLifecycleOwner) { it ->
+        viewModel.driverLocation.observe(viewLifecycleOwner, EventObserver { it ->
             Log.d("HomeFragment driver location", it.toString())
             val resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)
 
@@ -118,7 +118,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                         }))
             }
             MarkerAnimation().animateMarkerToICS(driverMarker, it)
-        }
+        })
 
         viewModel.clientToDestinationPath.observe(viewLifecycleOwner) {
             it?.let {
@@ -148,6 +148,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
         viewModel.clearMap.observe(viewLifecycleOwner, EventObserver {
             map.clear()
+//            driverMarker?.remove()
             driverMarker = null
             Log.d(TAG, "clear map")
         })
