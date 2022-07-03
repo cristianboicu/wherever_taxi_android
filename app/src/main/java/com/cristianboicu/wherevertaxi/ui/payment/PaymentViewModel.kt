@@ -2,9 +2,13 @@ package com.cristianboicu.wherevertaxi.ui.payment
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
+import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,6 +23,8 @@ class PaymentViewModel @Inject constructor(private val repository: IRepository) 
     private val _navigateToAddCard = MutableLiveData<Event<Unit>>()
     val navigateToAddCard = _navigateToAddCard
 
+    val paymentMethods = repository.observeLocalPaymentMethods()
+
     fun navigateBackFromAddCard() {
         navigateBackFromAddCard.value = Event(Unit)
     }
@@ -31,6 +37,12 @@ class PaymentViewModel @Inject constructor(private val repository: IRepository) 
         _navigateBackFromPayment.value = Event(Unit)
     }
 
-    fun addNewCard() {
+    fun addNewCard(cardNumber: String, cardExpiry: String, cardCode: Int) {
+        viewModelScope.launch {
+            val uid = repository.getAuthenticatedUserId()
+            val paymentMethod = PaymentMethod( cardNumber, cardExpiry, cardCode)
+            repository.savePaymentMethod(paymentMethod)
+            _navigateBackFromAddCard.value = Event(Unit)
+        }
     }
 }

@@ -2,11 +2,14 @@ package com.cristianboicu.wherevertaxi.data.repository
 
 import androidx.lifecycle.LiveData
 import com.cristianboicu.wherevertaxi.data.local.ILocalDataSource
+import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
+import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.User
+import com.cristianboicu.wherevertaxi.data.model.user.toLocalPaymentList
 import com.cristianboicu.wherevertaxi.data.remote.IRemoteDataSource
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.API_KEY
 import com.google.android.gms.maps.model.LatLng
@@ -19,11 +22,7 @@ class Repository @Inject constructor(
     private val localDataSource: ILocalDataSource,
 ) : IRepository {
 
-    override fun getLoggedUserId(): String? {
-        return remoteDataSource.getLoggedUserId()?.uid
-    }
-
-    override suspend fun saveIfNewUser(uid: String, user: User): Boolean {
+    override suspend fun saveNewUserData(uid: String, user: User): Boolean {
         try {
             val remoteUser = remoteDataSource.getRemoteUser(uid)
             if (remoteUser == null) {
@@ -35,9 +34,18 @@ class Repository @Inject constructor(
                     user.email))
                 return true
             }
+            remoteUser.payment?.let {
+                saveLocalPaymentMethods(it.toLocalPaymentList(uid))
+            }
             return false
         } catch (e: Exception) {
             return false
+        }
+    }
+
+    private suspend fun saveLocalPaymentMethods(paymentMethods: List<LocalPaymentMethod>) {
+        for (p in paymentMethods) {
+            localDataSource.savePaymentMethod(p)
         }
     }
 
@@ -104,6 +112,27 @@ class Repository @Inject constructor(
 
     override suspend fun getCompletedRidesByUserId(uid: String): List<CompletedRide?> {
         return remoteDataSource.getCompletedRidesByUserId(uid)
+    }
+
+    override suspend fun savePaymentMethod(paymentMethod: PaymentMethod): Boolean {
+        return try {
+            val uid = getAuthenticatedUserId()
+            val key = remoteDataSource.savePaymentMethod(uid!!, paymentMethod)
+            val localPaymentMethod = LocalPaymentMethod(key!!,
+                uid,
+                paymentMethod.cardNumber!!,
+                paymentMethod.cardExpirationDate!!,
+                paymentMethod.cardCode!!)
+            localDataSource.savePaymentMethod(localPaymentMethod)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override fun observeLocalPaymentMethods(): LiveData<List<LocalPaymentMethod>> {
+        val uid = getAuthenticatedUserId()
+        return localDataSource.observeLocalPaymentMethods(uid!!)
     }
 
     override suspend fun postRideRequest(rideRequest: RideRequest): String? {

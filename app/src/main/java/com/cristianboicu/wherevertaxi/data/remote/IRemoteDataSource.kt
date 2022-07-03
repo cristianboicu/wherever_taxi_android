@@ -5,6 +5,7 @@ import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
+import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.auth.FirebaseUser
@@ -53,4 +54,6 @@ interface IRemoteDataSource {
     ): String?
 
     suspend fun saveRemoteUser(uid: String, user: User)
+
+    suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String?
 }

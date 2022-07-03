@@ -7,6 +7,7 @@ import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
+import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.remote.cloud.ICloudServiceApi
 import com.cristianboicu.wherevertaxi.data.remote.firebase.IFirebaseApi
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -111,5 +112,9 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun saveRemoteUser(uid: String, user: User) {
         return firebaseApi.saveRemoteUser(uid, user)
+    }
+
+    override suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String? {
+        return firebaseApi.savePaymentMethod(uid, remotePayment)
     }
 }

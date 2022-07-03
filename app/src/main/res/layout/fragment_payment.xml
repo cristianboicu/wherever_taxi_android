@@ -82,14 +82,16 @@
 
         </LinearLayout>
 
-        <include
-            android:id="@+id/card1"
-            layout="@layout/item_card"
+        <LinearLayout
+            android:id="@+id/layout_payments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/small_value"
+            android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_cash" />
+            app:layout_constraintTop_toBottomOf="@id/layout_cash">
+
+        </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_add_payment"

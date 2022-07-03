@@ -70,7 +70,7 @@ class HomeViewModel @Inject constructor(
     private val destination = MutableLiveData<LatLng>()
     val origin = MutableLiveData<LatLng>()
 
-    private val userId = repository.getLoggedUserId()
+    private val userId = repository.getAuthenticatedUserId()
 
     val currentRideData = MutableLiveData<OngoingRideData?>()
 
@@ -164,9 +164,9 @@ class HomeViewModel @Inject constructor(
             comfortView.layoutCarType.isEnabled && comfortView.layoutCarType.isSelected
         Log.d(TAG, "$standardCar $comfortCar")
 
-        var vehicleClass = "Standard"
+        var vehicleClass = VehicleClass.STANDARD.toString()
         if (comfortCar) {
-            vehicleClass = "Comfort"
+            vehicleClass = VehicleClass.COMFORT.toString()
         }
         viewModelScope.launch {
             var originPlainText = async { repository.getReverseGeocoding(origin.value!!) }
@@ -324,4 +324,9 @@ enum class RideState {
     RIDE_PENDING,
     RIDE_ACCEPTED,
     RIDE_COMPLETED
+}
+
+enum class VehicleClass {
+    STANDARD,
+    COMFORT
 }

@@ -4,9 +4,12 @@ import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
+import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants.PAYMENT_PATH
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.RIDE_REQUEST_PATH
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants.USERS_PATH
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -128,6 +131,19 @@ class FirebaseApi
             key
         } catch (e: Exception) {
             Log.d(TAG, "error adding ride request ${e.message}")
+            null
+        }
+    }
+
+    override suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String? {
+        return try {
+            val key = database.child(USERS_PATH).child(uid).child(PAYMENT_PATH).push()
+                key.setValue(remotePayment)
+                .await()
+            Log.d(TAG, "succes adding payment")
+            key.key
+        } catch (e: Exception) {
+            Log.d(TAG, "error adding payment ${e.message}")
             null
         }
     }

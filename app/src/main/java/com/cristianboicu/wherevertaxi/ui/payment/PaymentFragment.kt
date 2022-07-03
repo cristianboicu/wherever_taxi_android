@@ -13,7 +13,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentPaymentBinding
+import com.cristianboicu.wherevertaxi.databinding.ItemCardBinding
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class PaymentFragment : Fragment() {
@@ -28,12 +30,12 @@ class PaymentFragment : Fragment() {
         binding.lifecycleOwner = this
         viewModel = ViewModelProvider(this)[PaymentViewModel::class.java]
         binding.viewModel = viewModel
-        setUpUi(binding)
-        setUpObservers(binding)
+
+        setUpObservers(binding, container!!)
         return binding.root
     }
 
-    private fun setUpObservers(binding: FragmentPaymentBinding) {
+    private fun setUpObservers(binding: FragmentPaymentBinding, container: ViewGroup) {
         viewModel.navigateBackFromPayment.observe(viewLifecycleOwner) {
             this.findNavController().navigate(
                 PaymentFragmentDirections.actionPaymentFragmentToHomeFragment()
@@ -43,6 +45,22 @@ class PaymentFragment : Fragment() {
             this.findNavController().navigate(
                 PaymentFragmentDirections.actionPaymentFragmentToAddPaymentFragment()
             )
+        }
+
+        viewModel.paymentMethods.observe(viewLifecycleOwner) {
+            Log.d("Payment", it.size.toString())
+
+            val root = binding.layoutPayments
+
+            for (i in it.indices) {
+                val element: ItemCardBinding =
+                    DataBindingUtil.inflate(layoutInflater, R.layout.item_card, container, false)
+
+                element.tvCardNumber.text = it[i].cardNumber
+                element.root.id = i
+                root.addView(element.root)
+            }
+            setUpUi(binding)
         }
     }
 

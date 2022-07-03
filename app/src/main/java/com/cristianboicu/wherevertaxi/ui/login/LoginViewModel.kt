@@ -14,14 +14,15 @@ class LoginViewModel @Inject constructor(val repository: IRepository) : ViewMode
 
 
     fun saveIfNewUser(uid: String, user: User) {
-        Log.d("VerificationFragment", "save new user to db")
+        Log.d("VerificationFragment", "save new user to db ${user.payment}")
 
         viewModelScope.launch {
-            if (!repository.saveIfNewUser(uid, user)) {
+            if (!repository.saveNewUserData(uid, user)) {
                 Log.d("VerificationFragment", "it is not a new user so just refresh db")
                 repository.refreshAuthenticatedUser()
             }
         }
     }
+
 
 }
