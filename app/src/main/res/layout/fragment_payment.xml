@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.cristianboicu.wherevertaxi.ui.payment.PaymentViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/small_value"
+        android:paddingTop="56dp"
+        android:paddingBottom="@dimen/small_value"
+        tools:context=".ui.payment.PaymentFragment">
+
+        <ImageButton
+            android:id="@+id/btn_back_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_value"
+            android:background="@color/white"
+            android:onClick="@{()->viewModel.navigateBackFromPayment()}"
+            android:padding="@dimen/small_value"
+            android:src="@drawable/ic_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/big_value"
+            android:text="@string/payment"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_back_payment"
+            app:layout_constraintStart_toEndOf="@+id/btn_back_payment"
+            app:layout_constraintTop_toTopOf="@+id/btn_back_payment" />
+
+        <LinearLayout
+            android:id="@+id/layout_cash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/big_value"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/medium_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_back_payment">
+
+            <ImageView
+                android:id="@+id/iv_cash"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="@dimen/small_value"
+                android:layout_weight="1"
+                android:src="@drawable/ic_cash"
+                app:tint="@color/black" />
+
+            <TextView
+                android:id="@+id/tv_cash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:text="@string/cash"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rb_selected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/small_value"
+                android:layout_weight="1"
+                android:checked="true" />
+
+        </LinearLayout>
+
+        <include
+            android:id="@+id/card1"
+            layout="@layout/item_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_cash" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_add_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/medium_value"
+            android:layout_marginBottom="@dimen/big_value"
+            android:onClick="@{()-> viewModel.navigateToAddCard()}"
+            android:src="@drawable/ic_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="@color/white" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

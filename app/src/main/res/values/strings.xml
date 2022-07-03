@@ -23,10 +23,15 @@
     <string name="cancel_request">Cancel request</string>
     <string name="searching_for_drivers">Searching for drivers</string>
     <string name="ride_accepted">Ride accepted</string>
-    <string name="payment">Payment</string>
     <string name="ride_completed">Ride completed</string>
     <string name="submit">Submit</string>
     <string name="rate_your_ride">Rate your ride</string>
     <string name="rate_your_driver">Rate your driver</string>
     <string name="my_rides">My Rides</string>
+    <string name="payment">Payment</string>
+    <string name="cash">Cash</string>
+    <string name="add_card">Add Card</string>
+    <string name="secure_code">Secure code</string>
+    <string name="expiry_date">Expiry date</string>
+    <string name="card_number">Card number</string>
 </resources>

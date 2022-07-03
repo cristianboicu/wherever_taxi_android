@@ -14,21 +14,25 @@
         <entry key="app/src/main/res/drawable/bg_sign_in_btn.xml" value="0.169" />
         <entry key="app/src/main/res/drawable/bg_sign_in_btn_pressed.xml" value="0.114" />
         <entry key="app/src/main/res/drawable/bg_where_to.xml" value="0.1395" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.146" />
         <entry key="app/src/main/res/drawable/rounded_corners_bg.xml" value="0.114" />
         <entry key="app/src/main/res/drawable/selector_sign_in_with.xml" value="0.1725" />
         <entry key="app/src/main/res/drawable/shape_rounded_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.27247451343836887" />
         <entry key="app/src/main/res/layout/bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/btn_sign_in_with.xml" value="0.30512820512820515" />
+        <entry key="app/src/main/res/layout/fragment_add_payment.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_edit_user_data.xml" value="0.2953125" />
         <entry key="app/src/main/res/layout/fragment_enter_verification_code.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_log_in.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_payment.xml" value="0.23167928059895831" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_ride_history.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/fragment_splash_screen.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_verification_code.xml" value="0.18823977739383013" />
         <entry key="app/src/main/res/layout/item_car.xml" value="0.21150054931640627" />
+        <entry key="app/src/main/res/layout/item_card.xml" value="0.18916371663411455" />
         <entry key="app/src/main/res/layout/item_place.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/item_ride_history.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/menu/drawer_view.xml" value="0.1" />
