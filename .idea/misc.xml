@@ -22,7 +22,7 @@
         <entry key="app/src/main/res/layout/bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/btn_sign_in_with.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_add_payment.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/fragment_edit_user_data.xml" value="0.2953125" />
+        <entry key="app/src/main/res/layout/fragment_edit_user_data.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_enter_verification_code.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_log_in.xml" value="0.25" />
@@ -30,7 +30,7 @@
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_ride_history.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/fragment_splash_screen.xml" value="0.30512820512820515" />
-        <entry key="app/src/main/res/layout/fragment_verification_code.xml" value="0.18823977739383013" />
+        <entry key="app/src/main/res/layout/fragment_verification_code.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_car.xml" value="0.21150054931640627" />
         <entry key="app/src/main/res/layout/item_card.xml" value="0.18916371663411455" />
         <entry key="app/src/main/res/layout/item_place.xml" value="0.3098958333333333" />

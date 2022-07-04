@@ -40,7 +40,7 @@ class AddPaymentFragment : Fragment() {
             val cardNumber = binding.etCardNumber.text.toString()
             val cardExpiry = binding.etCardExpire.text.toString()
             val cardCode = binding.etCardCode.text.toString()
-            if (cardNumber.isNotEmpty() && cardExpiry.isNotEmpty() && cardCode.isNotEmpty()) {
+            if (cardNumber.isNotEmpty() && cardNumber.length == 16 && cardExpiry.isNotEmpty() && cardCode.isNotEmpty() && cardCode.length == 3) {
                 viewModel.addNewCard(cardNumber, cardExpiry, cardCode.toInt())
             } else {
                 Toast.makeText(this.context, "Invalid data provided!", Toast.LENGTH_SHORT).show()

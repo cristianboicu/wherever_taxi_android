@@ -74,16 +74,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider" />
 
-        <include
-            android:id="@+id/btn_sign_in_facebook"
-            layout="@layout/btn_sign_in_with"
-            android:background="@drawable/bg_sign_in_btn"
-            android:layout_marginTop="@dimen/medium_value"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_sign_in_google" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

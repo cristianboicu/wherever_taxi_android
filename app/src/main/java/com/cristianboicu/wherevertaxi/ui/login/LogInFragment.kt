@@ -56,7 +56,6 @@ class LogInFragment : Fragment() {
 
     private fun setUpUi(binding: FragmentLogInBinding) {
         binding.btnSignInGoogle.tvSignInWith.text = this.getString(R.string.sign_in_with_google)
-        binding.btnSignInFacebook.tvSignInWith.text = this.getString(R.string.sign_in_with_facebook)
 
         binding.btnSignIn.setOnClickListener {
             binding.editTextPhone.setText("+37368026689")
@@ -68,6 +67,7 @@ class LogInFragment : Fragment() {
                 }
             }
         }
+
     }
 
     private fun requestVerificationCode(number: String) {

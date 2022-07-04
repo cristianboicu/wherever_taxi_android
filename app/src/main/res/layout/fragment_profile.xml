@@ -42,7 +42,8 @@
                 android:layout_marginStart="@dimen/big_value"
                 android:text="@string/profile"
                 android:textColor="@color/black"
-                android:textSize="22sp"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/imageButton"
                 app:layout_constraintStart_toEndOf="@+id/imageButton"
                 app:layout_constraintTop_toTopOf="@+id/imageButton" />
@@ -123,6 +124,7 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
+                    android:layout_marginHorizontal="@dimen/small_value"
                     android:src="@drawable/ic_email"
                     app:tint="@color/gray_border" />
 
@@ -130,7 +132,7 @@
                     android:id="@+id/tv_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/medium_value"
+                    android:layout_marginStart="@dimen/medium_value"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -142,9 +144,10 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/separator_layout"
                 android:layout_width="match_parent"
-                android:layout_height="10dp"
+                android:layout_height="1dp"
                 android:layout_marginVertical="@dimen/medium_value"
-                android:background="@color/primaryDarkColor"
+                android:background="@color/gray_border"
+                android:layout_marginHorizontal="@dimen/medium_value"
                 app:layout_constraintTop_toBottomOf="@+id/profile_email"
                 tools:layout_editor_absoluteX="8dp" />
 
@@ -165,14 +168,15 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_log_out"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_logout"
                     app:tint="@color/red" />
 
                 <TextView
                     android:id="@+id/tv_log_out"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/medium_value"
+                    android:layout_marginStart="@dimen/big_value"
                     android:text="@string/log_out"
                     android:textColor="@color/red"
                     android:textSize="18sp"

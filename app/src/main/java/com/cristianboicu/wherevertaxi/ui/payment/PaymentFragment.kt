@@ -1,5 +1,6 @@
 package com.cristianboicu.wherevertaxi.ui.payment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,6 +36,7 @@ class PaymentFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setUpObservers(binding: FragmentPaymentBinding, container: ViewGroup) {
         viewModel.navigateBackFromPayment.observe(viewLifecycleOwner) {
             this.findNavController().navigate(
@@ -56,7 +58,7 @@ class PaymentFragment : Fragment() {
                 val element: ItemCardBinding =
                     DataBindingUtil.inflate(layoutInflater, R.layout.item_card, container, false)
 
-                element.tvCardNumber.text = it[i].cardNumber
+                element.tvCardNumber.text = "**** " + it[i].cardNumber.subSequence(0, 4)
                 element.root.id = i
                 root.addView(element.root)
             }
@@ -81,7 +83,7 @@ class PaymentFragment : Fragment() {
         }
     }
 
-    fun <T : View> ViewGroup.getViewsByType(tClass: Class<T>): List<T> {
+    private fun <T : View> ViewGroup.getViewsByType(tClass: Class<T>): List<T> {
         return mutableListOf<T?>().apply {
             for (i in 0 until childCount) {
                 val child = getChildAt(i)

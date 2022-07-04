@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -14,7 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/small_value"
-        android:paddingVertical="@dimen/very_big_value"
+        android:paddingVertical="56dp"
         tools:context=".ui.profile.EditUserDataFragment">
 
         <LinearLayout
@@ -26,10 +27,11 @@
             <ImageButton
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@color/white"
                 android:layout_weight="1"
+                android:background="@color/white"
                 android:onClick="@{()->viewModel.navigateBackToProfile()}"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back"
+                app:tint="@color/black" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -38,15 +40,17 @@
                 android:layout_weight="20"
                 android:text="@string/edit_profile"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <ImageButton
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@color/white"
                 android:layout_weight="1"
+                android:background="@color/white"
                 android:onClick="@{()->viewModel.saveModifiedUser(etFname.getText().toString(),etSname.getText().toString(),etEmail.getText().toString())}"
-                android:src="@drawable/ic_done" />
+                android:src="@drawable/ic_done"
+                app:tint="@color/black" />
         </LinearLayout>
 
         <EditText
@@ -54,45 +58,50 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium_value"
+            android:layout_marginHorizontal="@dimen/small_value"
+            android:hint="@string/first_name"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
-            android:hint="@string/first_name"
             android:text="@{viewModel.loadedUser.fname}" />
 
         <EditText
             android:id="@+id/et_sname"
             android:layout_width="match_parent"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:maxLines="1"
             android:layout_height="wrap_content"
             android:hint="@string/second_name"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:layout_marginHorizontal="@dimen/small_value"
+            android:maxLines="1"
             android:text="@{viewModel.loadedUser.sname}" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_value"
             android:enabled="false"
+            android:hint="@string/phone_number"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
-            android:hint="@string/phone_number"
             android:text="@{viewModel.loadedUser.phone}" />
 
         <EditText
             android:id="@+id/et_email"
             android:layout_width="match_parent"
-            android:imeOptions="actionDone"
-            android:maxLines="1"
-            android:inputType="textEmailAddress"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_value"
             android:hint="@string/email"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
             android:text="@{viewModel.loadedUser.email}" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_value"
             android:layout_marginTop="@dimen/small_value"
             android:text="@string/your_phone_number_can_t_be_changed"
             android:textColor="@color/black" />
