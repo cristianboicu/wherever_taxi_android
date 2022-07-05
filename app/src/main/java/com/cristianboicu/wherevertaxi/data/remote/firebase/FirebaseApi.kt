@@ -1,5 +1,6 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
+import android.app.Activity
 import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
@@ -12,8 +13,11 @@ import com.cristianboicu.wherevertaxi.utils.ProjectConstants.RIDE_REQUEST_PATH
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.USERS_PATH
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.tasks.await
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class FirebaseApi
@@ -138,7 +142,7 @@ class FirebaseApi
     override suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String? {
         return try {
             val key = database.child(USERS_PATH).child(uid).child(PAYMENT_PATH).push()
-                key.setValue(remotePayment)
+            key.setValue(remotePayment)
                 .await()
             Log.d(TAG, "succes adding payment")
             key.key
@@ -146,5 +150,19 @@ class FirebaseApi
             Log.d(TAG, "error adding payment ${e.message}")
             null
         }
+    }
+
+    override fun sendVerificationCode(
+        activity: Activity,
+        phoneNumber: String,
+        authenticationCallback: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
+    ) {
+        val options = PhoneAuthOptions.newBuilder(firebaseAuth)
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(60L, TimeUnit.SECONDS)
+            .setActivity(activity)
+            .setCallbacks(authenticationCallback)
+            .build()
+        PhoneAuthProvider.verifyPhoneNumber(options)
     }
 }

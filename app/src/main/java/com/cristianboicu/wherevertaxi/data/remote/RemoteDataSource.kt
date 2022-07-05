@@ -1,17 +1,19 @@
 package com.cristianboicu.wherevertaxi.data.remote
 
+import android.app.Activity
 import android.util.Log
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
-import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.route.DirectionResponses
 import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
+import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.data.remote.cloud.ICloudServiceApi
 import com.cristianboicu.wherevertaxi.data.remote.firebase.IFirebaseApi
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DatabaseReference
 import javax.inject.Inject
 
@@ -38,7 +40,7 @@ class RemoteDataSource @Inject constructor(
         return firebaseApi.listenToRequestedRide(rideId)
     }
 
-    override suspend fun listenToCompletedRide(uid:String, rideId: String): DatabaseReference {
+    override suspend fun listenToCompletedRide(uid: String, rideId: String): DatabaseReference {
         return firebaseApi.listenToCompletedRide(uid, rideId)
     }
 
@@ -101,7 +103,7 @@ class RemoteDataSource @Inject constructor(
         return cloudServiceApi.getPredictions(query)
     }
 
-    override suspend fun getAvailableDrivers(): List<Driver?>?{
+    override suspend fun getAvailableDrivers(): List<Driver?>? {
         return firebaseApi.getAvailableDrivers()
     }
 
@@ -115,5 +117,13 @@ class RemoteDataSource @Inject constructor(
 
     override suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String? {
         return firebaseApi.savePaymentMethod(uid, remotePayment)
+    }
+
+    override fun sendVerificationCode(
+        activity: Activity,
+        phoneNumber: String,
+        authenticationCallback: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
+    ) {
+        firebaseApi.sendVerificationCode(activity, phoneNumber, authenticationCallback)
     }
 }

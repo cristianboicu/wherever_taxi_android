@@ -29,6 +29,7 @@ import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesAdapter
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesListener
 import com.cristianboicu.wherevertaxi.utils.EventObserver
 import com.cristianboicu.wherevertaxi.utils.MarkerAnimation
+import com.cristianboicu.wherevertaxi.utils.ProjectConstants
 import com.cristianboicu.wherevertaxi.utils.Util
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -38,8 +39,15 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 
 @AndroidEntryPoint

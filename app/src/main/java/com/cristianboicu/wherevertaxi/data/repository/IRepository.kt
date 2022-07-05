@@ -1,8 +1,9 @@
 package com.cristianboicu.wherevertaxi.data.repository
 
+import android.app.Activity
 import androidx.lifecycle.LiveData
-import com.cristianboicu.wherevertaxi.data.model.payment.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
+import com.cristianboicu.wherevertaxi.data.model.payment.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
@@ -10,9 +11,16 @@ import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DatabaseReference
 
 interface IRepository {
+
+    fun sendVerificationCode(
+        activity: Activity,
+        phoneNumber: String,
+        authenticationCallback: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
+    )
 
     suspend fun refreshAuthenticatedUser()
 

@@ -1,11 +1,13 @@
 package com.cristianboicu.wherevertaxi.data.remote.firebase
 
+import android.app.Activity
 import com.cristianboicu.wherevertaxi.data.model.driver.Driver
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DatabaseReference
 
 interface IFirebaseApi {
@@ -36,4 +38,10 @@ interface IFirebaseApi {
     ): String?
 
     suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String?
+
+    fun sendVerificationCode(
+        activity: Activity,
+        phoneNumber: String,
+        authenticationCallback: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+    )
 }

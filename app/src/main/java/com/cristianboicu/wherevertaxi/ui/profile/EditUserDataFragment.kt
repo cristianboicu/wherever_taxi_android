@@ -22,7 +22,7 @@ class EditUserDataFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         val binding: FragmentEditUserDataBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_user_data, container, false)
         binding.lifecycleOwner = viewLifecycleOwner

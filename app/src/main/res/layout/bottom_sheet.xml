@@ -24,14 +24,43 @@
             setSearchVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
-                android:id="@+id/search_layout"
+                android:id="@+id/search_layout_pickup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginHorizontal="@dimen/small_value"
+                android:layout_marginTop="@dimen/medium_value"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <EditText
+                    android:id="@+id/et_pickup_point"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:background="@drawable/bg_where_to"
+                    android:drawableStart="@drawable/ic_search"
+                    android:hint="@string/where_to"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:onTextChanged="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/search_layout_destination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/small_value"
@@ -40,7 +69,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/search_layout_pickup">
 
                 <EditText
                     android:id="@+id/et_where_to"
@@ -69,7 +98,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_layout" />
+                app:layout_constraintTop_toBottomOf="@+id/search_layout_destination" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
@@ -206,6 +235,7 @@
             setRideCompletedVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
             android:layout_marginTop="@dimen/medium_value"
             android:gravity="center_horizontal"
             android:orientation="vertical"
