@@ -7,13 +7,13 @@
 
         <variable
             name="viewModel"
-            type="com.cristianboicu.wherevertaxi.ui.main.HomeViewModel" />
+            type="com.cristianboicu.wherevertaxi.ui.home.HomeViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.main.HomeFragment">
+        tools:context=".ui.home.HomeFragment">
 
         <fragment
             android:id="@+id/map"

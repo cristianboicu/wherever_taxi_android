@@ -1,4 +1,4 @@
-package com.cristianboicu.wherevertaxi.data.model
+package com.cristianboicu.wherevertaxi.data.model.payment
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

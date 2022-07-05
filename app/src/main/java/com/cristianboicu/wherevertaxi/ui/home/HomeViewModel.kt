@@ -1,4 +1,4 @@
-package com.cristianboicu.wherevertaxi.ui.main
+package com.cristianboicu.wherevertaxi.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -91,7 +91,7 @@ class HomeViewModel @Inject constructor(
                     markerList.add(LatLng(item.value.currentLocation!!.lat!!,
                         item.value.currentLocation!!.lng!!))
                 }
-                generateAvailableDriverMarkers(markerList)
+                _availableDriverMarkers.value = generateAvailableDriverMarkers(markerList)
             }
         }
 
@@ -157,19 +157,9 @@ class HomeViewModel @Inject constructor(
         _rideState.value = RideState.SELECT_DESTINATION
     }
 
-    fun onCarSelected(standardView: ItemCarBinding, comfortView: ItemCarBinding) {
-        val standardCar =
-            standardView.layoutCarType.isEnabled && standardView.layoutCarType.isSelected
-        val comfortCar =
-            comfortView.layoutCarType.isEnabled && comfortView.layoutCarType.isSelected
-        Log.d(TAG, "$standardCar $comfortCar")
-
-        var vehicleClass = VehicleClass.STANDARD.toString()
-        if (comfortCar) {
-            vehicleClass = VehicleClass.COMFORT.toString()
-        }
+    fun onCarSelected(vehicleClass: String) {
         viewModelScope.launch {
-            var originPlainText = async { repository.getReverseGeocoding(origin.value!!) }
+            val originPlainText = async { repository.getReverseGeocoding(origin.value!!) }
             val destinationPlainText = async { repository.getReverseGeocoding(destination.value!!) }
 
             val temp = createRideRequest(
@@ -202,7 +192,7 @@ class HomeViewModel @Inject constructor(
             vehicleClass = vehicleClass,
             date = getCurrentDate(),
             time = getCurrentTime(),
-            price =  getRandom(10, 30),
+            price = getRandom(10, 30),
             payment = "Cash"
         )
     }
@@ -291,7 +281,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun generateAvailableDriverMarkers(markerList: List<LatLng>) {
+    private fun generateAvailableDriverMarkers(markerList: List<LatLng>): MutableList<MarkerOptions> {
         val res = mutableListOf<MarkerOptions>()
         val resizedBitmapIcon = getBitmapFromSvg(context, R.drawable.car_model)
 
@@ -303,7 +293,7 @@ class HomeViewModel @Inject constructor(
                 })
             )
         }
-        _availableDriverMarkers.value = res
+        return res
     }
 
     fun getPlacesPrediction(query: String) {

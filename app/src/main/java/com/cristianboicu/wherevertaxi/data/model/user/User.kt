@@ -1,6 +1,6 @@
 package com.cristianboicu.wherevertaxi.data.model.user
 
-import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
+import com.cristianboicu.wherevertaxi.data.model.payment.LocalPaymentMethod
 import java.io.Serializable
 
 data class User(

@@ -1,4 +1,4 @@
-package com.cristianboicu.wherevertaxi.ui.rideHistory
+package com.cristianboicu.wherevertaxi.ui.adapter.history
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

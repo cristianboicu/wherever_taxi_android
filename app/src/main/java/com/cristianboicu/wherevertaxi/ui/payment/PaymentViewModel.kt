@@ -3,7 +3,6 @@ package com.cristianboicu.wherevertaxi.ui.payment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.PaymentMethod
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
 import com.cristianboicu.wherevertaxi.utils.Event

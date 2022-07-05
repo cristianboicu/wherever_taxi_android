@@ -2,7 +2,7 @@ package com.cristianboicu.wherevertaxi.data.repository
 
 import androidx.lifecycle.LiveData
 import com.cristianboicu.wherevertaxi.data.local.ILocalDataSource
-import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
+import com.cristianboicu.wherevertaxi.data.model.payment.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest

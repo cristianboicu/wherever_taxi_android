@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentRideHistoryBinding
+import com.cristianboicu.wherevertaxi.ui.adapter.history.RideHistoryAdapter
 import com.cristianboicu.wherevertaxi.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 

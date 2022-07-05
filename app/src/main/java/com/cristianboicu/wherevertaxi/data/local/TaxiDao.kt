@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
+import com.cristianboicu.wherevertaxi.data.model.payment.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.ride.LocalRide
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 

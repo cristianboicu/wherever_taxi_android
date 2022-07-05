@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.cristianboicu.wherevertaxi.ui.main.HomeViewModel" />
+            type="com.cristianboicu.wherevertaxi.ui.home.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -107,7 +107,6 @@
                 android:layout_marginTop="@dimen/medium_value"
                 android:background="@drawable/bg_rounded_corners"
                 android:backgroundTint="@color/secondaryColor"
-                android:onClick="@{()->viewModel.onCarSelected(standardCar, comfortCar)}"
                 android:paddingVertical="@dimen/medium_value"
                 android:text="@string/select_car"
                 android:textAllCaps="false"

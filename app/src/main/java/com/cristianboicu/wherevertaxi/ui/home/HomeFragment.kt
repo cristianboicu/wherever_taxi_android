@@ -1,4 +1,4 @@
-package com.cristianboicu.wherevertaxi.ui.main
+package com.cristianboicu.wherevertaxi.ui.home
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -212,11 +212,26 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             it.isSelected = true
             binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
         }
+
         binding.bottomSheet.comfortCar.layoutCarType.setOnClickListener {
             it.isSelected = true
             binding.bottomSheet.standardCar.layoutCarType.isSelected = false
         }
 
+        binding.bottomSheet.btnSelectCar.setOnClickListener {
+            val standardCar =
+                binding.bottomSheet.comfortCar.layoutCarType.isEnabled && binding.bottomSheet.comfortCar.layoutCarType.isSelected
+            val comfortCar =
+                binding.bottomSheet.comfortCar.layoutCarType.isEnabled && binding.bottomSheet.comfortCar.layoutCarType.isSelected
+            Log.d(TAG, "$standardCar $comfortCar")
+
+            var vehicleClass = VehicleClass.STANDARD.toString()
+            if (comfortCar) {
+                vehicleClass = VehicleClass.COMFORT.toString()
+            }
+            viewModel.onCarSelected(vehicleClass)
+
+        }
     }
 
     private fun configureShowMyLocationButton(mMapFragment: SupportMapFragment?) {

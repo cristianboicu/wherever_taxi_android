@@ -10,7 +10,7 @@ import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
 import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
-import com.cristianboicu.wherevertaxi.ui.main.RideState
+import com.cristianboicu.wherevertaxi.ui.home.RideState
 
 @SuppressLint("SetTextI18n")
 @BindingAdapter("userName")

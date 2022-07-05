@@ -1,7 +1,7 @@
 package com.cristianboicu.wherevertaxi.data.local
 
 import androidx.lifecycle.LiveData
-import com.cristianboicu.wherevertaxi.data.model.LocalPaymentMethod
+import com.cristianboicu.wherevertaxi.data.model.payment.LocalPaymentMethod
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 
 interface ILocalDataSource {

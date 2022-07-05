@@ -11,7 +11,6 @@ import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import com.cristianboicu.wherevertaxi.data.model.user.User
 import com.cristianboicu.wherevertaxi.ui.login.LogInFragment
 import com.cristianboicu.wherevertaxi.ui.verificationCode.VerificationCodeFragment
 import com.cristianboicu.wherevertaxi.utils.ProjectConstants.DATABASE_URL
@@ -42,11 +41,11 @@ class MainActivity : AppCompatActivity(), LogInFragment.SendVerificationCode {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setTransparentStatusBar()
+        setupDrawerLayout()
         firebaseAuth = FirebaseAuth.getInstance()
         database =
             Firebase.database(DATABASE_URL).reference
 
-        setupDrawerLayout()
     }
 
     override fun onSupportNavigateUp(): Boolean {

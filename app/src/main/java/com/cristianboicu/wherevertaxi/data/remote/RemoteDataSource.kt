@@ -18,8 +18,7 @@ import javax.inject.Inject
 class RemoteDataSource @Inject constructor(
     private val firebaseApi: IFirebaseApi,
     private val cloudServiceApi: ICloudServiceApi,
-) :
-    IRemoteDataSource {
+) : IRemoteDataSource {
 
     override fun getLoggedUserId(): FirebaseUser? {
         return firebaseApi.getCurrentUser()
