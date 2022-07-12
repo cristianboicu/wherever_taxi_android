@@ -8,8 +8,7 @@ import retrofit2.Response
 interface ICloudServiceApi {
     suspend fun getDirection(
         origin: String,
-        destination: String,
-        apiKey: String,
+        destination: String
     ): Response<DirectionResponses>
 
     suspend fun getGeocoding(

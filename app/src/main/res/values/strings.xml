@@ -34,4 +34,6 @@
     <string name="secure_code">Secure code</string>
     <string name="expiry_date">Expiry date</string>
     <string name="card_number">Card number</string>
+    <string name="pick_up_location">Pick-up location</string>
+    <string name="current_location">Current location</string>
 </resources>

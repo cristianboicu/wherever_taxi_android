@@ -1,9 +1,11 @@
 package com.cristianboicu.wherevertaxi.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import com.cristianboicu.wherevertaxi.R
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -61,6 +63,19 @@ object Util {
         val hour = c.get(Calendar.HOUR_OF_DAY)
         val minute = c.get(Calendar.MINUTE)
         return "$hour:$minute"
+    }
+
+    fun saveSelectedPayment(activity: Activity, id: Int) {
+        val sharedPref = activity.getPreferences(Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putInt("selectedPayment", id)
+            apply()
+        }
+    }
+
+    fun getSelectedPayment(activity: Activity): Int {
+        val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
+        return sharedPref.getInt("selectedPayment", -1)
     }
 
 }

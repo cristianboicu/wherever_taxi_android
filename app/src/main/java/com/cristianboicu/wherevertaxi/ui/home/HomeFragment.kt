@@ -27,9 +27,8 @@ import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentHomeBinding
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesAdapter
 import com.cristianboicu.wherevertaxi.ui.adapter.places.PlacesListener
+import com.cristianboicu.wherevertaxi.utils.CustomAnimator
 import com.cristianboicu.wherevertaxi.utils.EventObserver
-import com.cristianboicu.wherevertaxi.utils.MarkerAnimation
-import com.cristianboicu.wherevertaxi.utils.ProjectConstants
 import com.cristianboicu.wherevertaxi.utils.Util
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -39,20 +38,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.concurrent.TimeUnit
 
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
-    GoogleMap.OnMyLocationClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
+    ActivityCompat.OnRequestPermissionsResultCallback {
 
     private var activityResultLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
@@ -63,46 +55,48 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
 
             if (allAreGranted) {
-                enableMyLocation()
+                enableUserCurrentLocation()
             }
         }
 
-    private val TAG = "HomeFragment"
     private lateinit var map: GoogleMap
     private lateinit var drawer: DrawerLayout
     private lateinit var mBottomSheetLayout: ConstraintLayout
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
     lateinit var viewModel: HomeViewModel
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var adapter: PlacesAdapter
+    private lateinit var binding: FragmentHomeBinding
+
     private var mCurrentLocation: LatLng? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     private val listOfDrivers = mutableListOf<Marker>()
     private var clientTripPath: Polyline? = null
     private var clientTripDestinationMarker: Marker? = null
     private var driverMarker: Marker? = null
-    private lateinit var resizedBitmapIcon: Bitmap
+    private val TAG = "HomeFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        val binding: FragmentHomeBinding =
+    ): View {
+        binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         binding.lifecycleOwner = this
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(this.requireActivity())
         viewModel = ViewModelProvider(this.requireActivity())[HomeViewModel::class.java]
-        Log.d("HomeFragment", "on createView")
 
         binding.viewModel = viewModel
         binding.bottomSheet.viewModel = viewModel
-        resizedBitmapIcon = Util.getBitmapFromSvg(context, R.drawable.car_model)!!
-        adapter = PlacesAdapter(PlacesListener {
-            viewModel.onDestinationSelected(it)
-        })
-        binding.bottomSheet.rvAutocomplete.adapter = adapter
 
+        adapter = PlacesAdapter(PlacesListener { placeId: String, placePrimary: String ->
+            onPlaceClicked(placeId,
+                placePrimary)
+        })
+
+        binding.bottomSheet.rvAutocomplete.adapter = adapter
         setUpUi(binding, savedInstanceState)
 
         requestCurrentLocation()
@@ -110,45 +104,31 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return binding.root
     }
 
+    private fun onPlaceClicked(placeId: String, placePrimary: String) {
+        viewModel.onPlaceSelected(
+            placeId = placeId,
+            placePrimary = placePrimary,
+            binding.bottomSheet.etPickupPoint,
+            binding.bottomSheet.etWhereTo
+        )
+    }
+
     private fun setUpObserver() {
+
         viewModel.driverLocation.observe(viewLifecycleOwner, EventObserver { it ->
-            Log.d("HomeFragment driver location", it.toString())
-
-            for (driver in listOfDrivers) {
-                driver.remove()
-            }
-
-            if (driverMarker == null) {
-                driverMarker = map.addMarker(
-                    MarkerOptions()
-                        .position(it).icon(resizedBitmapIcon.let {
-                            BitmapDescriptorFactory.fromBitmap(it)
-                        }))
-
-            }
-
-            MarkerAnimation.animateMarkerToICS(driverMarker, it)
+            removeAllDriverMarkers()
+            drawCurrentDriverMarker(it)
+            CustomAnimator.animateMarkerToICS(driverMarker, it)
         })
 
         viewModel.clientToDestinationPath.observe(viewLifecycleOwner) {
             it?.let {
-                Log.d("HomeFragment", "clint path ${it.toString()}")
-
-                val decodedShape = PolyUtil.decode(it)
-                clientTripPath?.remove()
-                clientTripDestinationMarker?.remove()
-
-                clientTripPath = map.addPolyline(drawPolyline(decodedShape))
-                clientTripDestinationMarker = map.addMarker(
-                    MarkerOptions()
-                        .position(decodedShape[decodedShape.size - 1]))
+                removeOldPath()
+                drawNewPath(it)
             }
         }
-
         viewModel.availableDriverMarkers.observe(viewLifecycleOwner) {
-            for (driver in listOfDrivers) {
-                driver.remove()
-            }
+            removeAllDriverMarkers()
             listOfDrivers.clear()
 
             for (marker in it) {
@@ -156,11 +136,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
-        viewModel.clearMap.observe(viewLifecycleOwner, EventObserver {
+        viewModel.clearData.observe(viewLifecycleOwner, EventObserver {
             map.clear()
-//            driverMarker?.remove()
             driverMarker = null
-            Log.d(TAG, "clear map")
+            binding.bottomSheet.etPickupPoint.setText("")
+            binding.bottomSheet.etWhereTo.setText("")
         })
 
         viewModel.placesPredictions.observe(viewLifecycleOwner) {
@@ -170,15 +150,55 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         viewModel.requestCurrentLocation.observe(viewLifecycleOwner, EventObserver {
             requestCurrentLocation()
         })
+
+        viewModel.userLocationAddressPlain.observe(viewLifecycleOwner) {
+            binding.bottomSheet.etPickupPoint.setText(it)
+        }
+    }
+
+    private fun drawCurrentDriverMarker(position: LatLng) {
+        val resizedBitmapIcon: Bitmap = Util.getBitmapFromSvg(context, R.drawable.car_model)!!
+
+        if (driverMarker == null) {
+            driverMarker = map.addMarker(
+                MarkerOptions()
+                    .position(position).icon(resizedBitmapIcon.let {
+                        BitmapDescriptorFactory.fromBitmap(it)
+                    }))
+
+        }
+    }
+
+    private fun removeAllDriverMarkers() {
+        for (driver in listOfDrivers) {
+            driver.remove()
+        }
+    }
+
+    private fun drawNewPath(path: String) {
+        val decodedShape = PolyUtil.decode(path)
+        clientTripPath = map.addPolyline(drawPolyline(decodedShape))
+        clientTripDestinationMarker = map.addMarker(
+            MarkerOptions()
+                .position(decodedShape[decodedShape.size - 1]))
+    }
+
+    private fun removeOldPath() {
+        clientTripPath?.remove()
+        clientTripDestinationMarker?.remove()
     }
 
     @SuppressLint("MissingPermission")
     private fun requestCurrentLocation() {
+
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 location?.let {
                     viewModel.origin.value = LatLng(it.latitude, it.longitude)
                     mCurrentLocation = LatLng(it.latitude, it.longitude)
+                    viewModel.getReverseGeocoding(mCurrentLocation)
+//                    Log.d(TAG," ${mCurrentLocation.toString().split(',')[0]}")
+//                    binding.bottomSheet.etPickupPoint.setText(mCurrentLocation.toString().split(',')[0])
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude,
                         it.longitude),
                         15f))
@@ -194,11 +214,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             .color(Color.BLUE)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setUpUi(binding: FragmentHomeBinding, savedInstanceState: Bundle?) {
-        val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
-        mMapFragment?.getMapAsync(this)
+        setUpMap()
 
-        configureShowMyLocationButton(mMapFragment)
+        binding.bottomSheet.standardCar.layoutCarType.isSelected = true
+        binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
+        binding.bottomSheet.comfortCar.tvCarType.text = "Comfort"
+        binding.bottomSheet.comfortCar.tvPrice.text = "LEI 22.3"
 
         mBottomSheetLayout = binding.bottomSheet.bottomSheetLayout
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout)
@@ -207,14 +230,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             sheetBehavior.setDraggable(true)
         }
-        binding.btnNavigationDrawer.setOnClickListener {
-            openDrawer()
-        }
 
-        binding.bottomSheet.standardCar.layoutCarType.isSelected = true
-        binding.bottomSheet.comfortCar.layoutCarType.isSelected = false
-        binding.bottomSheet.comfortCar.tvCarType.text = "Comfort"
-        binding.bottomSheet.comfortCar.tvPrice.text = "LEI 22.3"
+        binding.bottomSheet.etPickupPoint.setOnClickListener {
+            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            sheetBehavior.setDraggable(true)
+        }
 
         binding.bottomSheet.standardCar.layoutCarType.setOnClickListener {
             it.isSelected = true
@@ -227,19 +247,30 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         }
 
         binding.bottomSheet.btnSelectCar.setOnClickListener {
-            val standardCar =
-                binding.bottomSheet.comfortCar.layoutCarType.isEnabled && binding.bottomSheet.comfortCar.layoutCarType.isSelected
-            val comfortCar =
-                binding.bottomSheet.comfortCar.layoutCarType.isEnabled && binding.bottomSheet.comfortCar.layoutCarType.isSelected
-            Log.d(TAG, "$standardCar $comfortCar")
-
-            var vehicleClass = VehicleClass.STANDARD.toString()
-            if (comfortCar) {
-                vehicleClass = VehicleClass.COMFORT.toString()
-            }
-            viewModel.onCarSelected(vehicleClass)
-
+            selectVehicleClass(it)
         }
+
+        binding.btnNavigationDrawer.setOnClickListener {
+            openLeftMenu()
+        }
+    }
+
+    private fun selectVehicleClass(it: View?) {
+        val comfortCar =
+            binding.bottomSheet.comfortCar.layoutCarType.isEnabled && binding.bottomSheet.comfortCar.layoutCarType.isSelected
+
+        var vehicleClass = VehicleClass.STANDARD.toString()
+        if (comfortCar) {
+            vehicleClass = VehicleClass.COMFORT.toString()
+        }
+        viewModel.onVehicleClassSelected(vehicleClass)
+    }
+
+    private fun setUpMap() {
+        val mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
+        mMapFragment?.getMapAsync(this)
+
+        configureShowMyLocationButton(mMapFragment)
     }
 
     private fun configureShowMyLocationButton(mMapFragment: SupportMapFragment?) {
@@ -248,10 +279,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-        rlp.setMargins(0, 0, 30, 720)
+        rlp.setMargins(0, 0, 30, 760)
     }
 
-    private fun openDrawer() {
+    private fun openLeftMenu() {
         activity?.let {
             drawer.openDrawer(GravityCompat.START)
         }
@@ -260,13 +291,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         googleMap.setOnMyLocationButtonClickListener(this)
-        googleMap.setOnMyLocationClickListener(this)
-        enableMyLocation()
+        enableUserCurrentLocation()
         setUpObserver()
     }
 
     @SuppressLint("MissingPermission")
-    private fun enableMyLocation() {
+    private fun enableUserCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
                 requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -289,13 +319,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     override fun onResume() {
         super.onResume()
-        drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout)
-    }
-
-    /**
-     * Displays a dialog with error message explaining that the location permission is missing.
-     */
-    private fun showMissingPermissionError() {
+        drawer = requireActivity().findViewById(R.id.drawer_layout)
     }
 
     override fun onMyLocationButtonClick(): Boolean {
@@ -304,17 +328,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         return false
     }
 
-    override fun onMyLocationClick(location: Location) {
-        Toast.makeText(context, "Current location:\n$location", Toast.LENGTH_LONG)
-            .show()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "fragment destroyed")
     }
 }
-//
-//val locationButton =
-//    (mapFragment?.view?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
-//        Integer.parseInt("2")) as ImageView locationButton . setImageResource (R.drawable.ic_my_location_button)

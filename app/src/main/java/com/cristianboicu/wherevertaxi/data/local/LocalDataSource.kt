@@ -32,6 +32,10 @@ class LocalDataSource @Inject constructor(private val taxiDao: TaxiDao) : ILocal
         return taxiDao.savePaymentMethod(localPaymentMethod)
     }
 
+    override suspend fun deletePaymentMethod(id: String) {
+        return taxiDao.deletePaymentById(id)
+    }
+
     override fun observeLocalPaymentMethods(uid: String): LiveData<List<LocalPaymentMethod>> {
         return taxiDao.observeLocalPaymentMethods(uid)
     }

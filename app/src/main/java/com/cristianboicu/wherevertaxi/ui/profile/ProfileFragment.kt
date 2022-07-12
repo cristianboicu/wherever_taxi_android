@@ -69,7 +69,7 @@ class ProfileFragment : Fragment() {
         val am = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am[AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 500] =
             PendingIntent.getActivity(activity, 0, activity.intent, PendingIntent.FLAG_ONE_SHOT
-                    or PendingIntent.FLAG_CANCEL_CURRENT)
+                    or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val i = activity.baseContext.packageManager
             .getLaunchIntentForPackage(activity.baseContext.packageName)
 

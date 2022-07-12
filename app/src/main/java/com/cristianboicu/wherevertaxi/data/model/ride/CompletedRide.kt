@@ -5,7 +5,6 @@ data class CompletedRide(
     var did: String? = null,
     var originPlain: String? = null,
     var destinationPlain: String? = null,
-    var driverName: String? = null,
     var vehicle: String? = null,
     var payment: String? = null,
     var price: Double? = null,

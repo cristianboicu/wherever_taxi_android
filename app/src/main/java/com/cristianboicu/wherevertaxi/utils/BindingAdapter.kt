@@ -4,13 +4,15 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.data.model.ride.CompletedRide
-import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
+import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRide
 import com.cristianboicu.wherevertaxi.data.model.user.LocalUser
 import com.cristianboicu.wherevertaxi.ui.home.RideState
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 @SuppressLint("SetTextI18n")
 @BindingAdapter("userName")
@@ -58,11 +60,16 @@ fun View.setCarsVisibility(state: RideState) {
 }
 
 @BindingAdapter("setSearchVisibility")
-fun View.setSearchVisibility(state: RideState) {
+fun ConstraintLayout.setSearchVisibility(state: RideState) {
+    val behaviour = BottomSheetBehavior.from(parent as View)
+
     visibility = if (state == RideState.SELECT_DESTINATION) {
         View.VISIBLE
     } else {
         View.GONE
+    }
+    if (state != RideState.SELECT_DESTINATION) {
+        behaviour.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }
 
@@ -137,13 +144,13 @@ fun View.setEnabledDisabledComfort(availableDrivers: Map<String, AvailableDriver
 }
 
 @BindingAdapter("setAcceptedRideData")
-fun View.setAcceptedRideData(ongoingRideData: OngoingRideData?) {
-    ongoingRideData?.let {
-        findViewById<TextView>(R.id.tv_driver_name).text = ongoingRideData.driverName
-        findViewById<TextView>(R.id.tv_driver_vehicle).text = ongoingRideData.vehicle
-        findViewById<TextView>(R.id.tv_driver_vehicle_class).text = ongoingRideData.vehicleClass
+fun View.setAcceptedRideData(ongoingRide: OngoingRide?) {
+    ongoingRide?.let {
+        findViewById<TextView>(R.id.tv_driver_name).text = ongoingRide.driverName
+        findViewById<TextView>(R.id.tv_driver_vehicle).text = ongoingRide.vehicle
+        findViewById<TextView>(R.id.tv_driver_vehicle_class).text = ongoingRide.vehicleClass
         findViewById<TextView>(R.id.tv_driver_license_plate_number).text =
-            ongoingRideData.licensePlateNumber
+            ongoingRide.licensePlateNumber
     }
 }
 

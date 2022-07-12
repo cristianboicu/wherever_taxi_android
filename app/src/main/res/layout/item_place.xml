@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/small_value"
-        android:onClick="@{() -> clickListener.onClick(placeId)}"
+        android:onClick="@{() -> clickListener.onClick(placeId, place_primary)}"
         android:orientation="vertical">
 
         <TextView

@@ -4,11 +4,6 @@ import com.google.android.gms.maps.model.LatLng
 import java.io.Serializable
 
 data class OngoingRide(
-    var rideId: String? = null,
-    var ongoingRideData: OngoingRideData? = null,
-) : Serializable
-
-data class OngoingRideData(
     val uid: String? = null,
     val did: String? = null,
     val driverLocation: GeogLocation? = null,

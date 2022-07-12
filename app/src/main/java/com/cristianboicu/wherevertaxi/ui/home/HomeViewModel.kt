@@ -3,17 +3,18 @@ package com.cristianboicu.wherevertaxi.ui.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.EditText
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.data.model.driver.AvailableDriver
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeoLocation
-import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRideData
+import com.cristianboicu.wherevertaxi.data.model.ride.OngoingRide
 import com.cristianboicu.wherevertaxi.data.model.ride.RideRequest
 import com.cristianboicu.wherevertaxi.data.model.ride.toLatLng
 import com.cristianboicu.wherevertaxi.data.repository.IRepository
-import com.cristianboicu.wherevertaxi.databinding.ItemCarBinding
 import com.cristianboicu.wherevertaxi.utils.Event
 import com.cristianboicu.wherevertaxi.utils.Util.getBitmapFromSvg
 import com.cristianboicu.wherevertaxi.utils.Util.getCurrentDate
@@ -38,16 +39,18 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: IRepository,
-    @ApplicationContext val context: Context,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val TAG = "HomeViewModel"
 
+    private val userId = repository.getAuthenticatedUserId()
+
     private val _availableDriverMarkers = MutableLiveData<List<MarkerOptions>>()
     val availableDriverMarkers = _availableDriverMarkers
 
-    private val _clearMap = MutableLiveData<Event<Unit>>()
-    val clearMap = _clearMap
+    private val _clearData = MutableLiveData<Event<Unit>>()
+    val clearData = _clearData
 
     private val _requestCurrentLocation = MutableLiveData<Event<Unit>>()
     val requestCurrentLocation = _requestCurrentLocation
@@ -55,10 +58,10 @@ class HomeViewModel @Inject constructor(
     private val _rideState = MutableLiveData<RideState>()
     val rideState = _rideState
 
-    private val _placesPredictions = MutableLiveData<List<AutocompletePrediction>>()
+    private val _placesPredictions = MutableLiveData<MutableList<AutocompletePrediction>>()
     val placesPredictions = _placesPredictions
 
-    private val _availableDrivers = MutableLiveData<HashMap<String, AvailableDriver>?>()
+    private val _availableDrivers = MutableLiveData<Map<String, AvailableDriver>?>()
     val availableDrivers = _availableDrivers
 
     private val _driverLocation = MutableLiveData<Event<LatLng>>()
@@ -67,13 +70,15 @@ class HomeViewModel @Inject constructor(
     private val _clientToDestinationPath = MutableLiveData<String?>()
     val clientToDestinationPath = _clientToDestinationPath
 
-    private val destination = MutableLiveData<LatLng>()
-    val origin = MutableLiveData<LatLng>()
+    var destination = MutableLiveData<LatLng>()
+    var origin = MutableLiveData<LatLng>()
 
-    private val userId = repository.getAuthenticatedUserId()
+    private val userLocationAddress = MutableLiveData<String>()
+    val userLocationAddressPlain = userLocationAddress.map {
+        it.toString().split(',')[0]
+    }
 
-    val currentRideData = MutableLiveData<OngoingRideData?>()
-
+    val ongoingRideData = MutableLiveData<OngoingRide?>()
     var currentRideId: String? = null
 
     private lateinit var dbReferenceListener: DatabaseReference
@@ -83,7 +88,6 @@ class HomeViewModel @Inject constructor(
     private val availableDriversListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             _availableDrivers.value = dataSnapshot.getValue<HashMap<String, AvailableDriver>>()
-            Log.w(TAG, "data changed ${_availableDrivers.value}")
 
             _availableDrivers.value?.let {
                 val markerList = mutableListOf<LatLng>()
@@ -103,10 +107,10 @@ class HomeViewModel @Inject constructor(
     private val rideAcceptedListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             if (dataSnapshot.exists()) {
-                val ongoingRideData = dataSnapshot.getValue<OngoingRideData>()
+                val ongoingRideData = dataSnapshot.getValue<OngoingRide>()
                 ongoingRideData?.let {
                     Log.d(TAG, "ride accepted")
-                    currentRideData.value = ongoingRideData
+                    this@HomeViewModel.ongoingRideData.value = ongoingRideData
                     onRideAccepted(currentRideId!!)
                 }
             }
@@ -121,18 +125,16 @@ class HomeViewModel @Inject constructor(
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             viewModelScope.launch {
                 if (dataSnapshot.exists()) {
-                    Log.d(TAG, "ongoing ride listener")
-                    val ongoingRide = dataSnapshot.getValue<OngoingRideData>()
+                    val ongoingRide = dataSnapshot.getValue<OngoingRide>()
                     ongoingRide?.driverLocation?.let {
                         _driverLocation.postValue(Event(it.toLatLng()))
-                        Log.d(TAG, "driver lcoation ${_driverLocation.value}")
                     }
                 }
             }
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
-            Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            Log.w(TAG, databaseError.toException())
         }
     }
 
@@ -153,11 +155,72 @@ class HomeViewModel @Inject constructor(
     init {
         updateUserCurrentLocation()
         listenAvailableDrivers()
-        Log.d(TAG, "init vm${_clientToDestinationPath.value}")
         _rideState.value = RideState.SELECT_DESTINATION
     }
 
-    fun onCarSelected(vehicleClass: String) {
+    private fun updateUserCurrentLocation() {
+        _requestCurrentLocation.value = Event(Unit)
+    }
+
+    private fun listenAvailableDrivers() {
+        viewModelScope.launch {
+            dbAvailableDriversListener = repository.listenAvailableDrivers()
+            dbAvailableDriversListener.addValueEventListener(availableDriversListener)
+        }
+    }
+
+    fun getPlacesPrediction(query: String) {
+        viewModelScope.launch {
+            placesPredictions.value = repository.getPredictions(query)
+        }
+    }
+
+    fun onPlaceSelected(
+        placeId: String,
+        placePrimary: String,
+        pickUpPoint: EditText,
+        etWhereToPoint: EditText,
+    ) {
+        viewModelScope.launch {
+            if (pickUpPoint.hasFocus()) {
+                origin.value =
+                    repository.getGeocoding(placeId)
+                pickUpPoint.setText(placePrimary)
+                Log.d(TAG, "origin selected: ${origin.value}")
+            } else {
+                destination.value =
+                    repository.getGeocoding(placeId)
+                etWhereToPoint.setText(placePrimary)
+                Log.d(TAG, "destination selected: ${destination.value}")
+            }
+
+            if (origin.value != null && destination.value != null) {
+                onRouteSelected(origin.value!!, destination.value!!)
+            }
+        }
+    }
+
+    fun onRouteSelected(originPoint: LatLng, destinationPoint: LatLng) {
+        viewModelScope.launch {
+            _rideState.value = RideState.SELECT_CAR
+            try {
+                _clientToDestinationPath.value =
+                    repository.getDirection(originPoint,
+                        destinationPoint)
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    fun getReverseGeocoding(place: LatLng?) {
+        viewModelScope.launch {
+            place?.let {
+                userLocationAddress.value = repository.getReverseGeocoding(place)
+            }
+        }
+    }
+
+    fun onVehicleClassSelected(vehicleClass: String) {
         viewModelScope.launch {
             val originPlainText = async { repository.getReverseGeocoding(origin.value!!) }
             val destinationPlainText = async { repository.getReverseGeocoding(destination.value!!) }
@@ -197,9 +260,7 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun requestRide(
-        rideRequest: RideRequest,
-    ) {
+    private fun requestRide(rideRequest: RideRequest) {
         viewModelScope.launch {
             val key = repository.postRideRequest(rideRequest)
             key?.let {
@@ -210,19 +271,10 @@ class HomeViewModel @Inject constructor(
 
     private fun listenToRequestedRide(rideId: String) {
         viewModelScope.launch {
-            Log.d("HomeViewModel", "we are pending ride")
             currentRideId = rideId
             _rideState.value = RideState.RIDE_PENDING
             dbReferenceListener = repository.listenToRequestedRide(rideId)
             dbReferenceListener.addValueEventListener(rideAcceptedListener)
-        }
-    }
-
-    fun onRideCancel(rideId: String) {
-        viewModelScope.launch {
-            repository.cancelRide(rideId)
-            dbReferenceListener.removeEventListener(rideAcceptedListener)
-            resetData()
         }
     }
 
@@ -238,46 +290,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onRideCancel(rideId: String) {
+        viewModelScope.launch {
+            repository.cancelRide(rideId)
+            dbReferenceListener.removeEventListener(rideAcceptedListener)
+            resetData()
+        }
+    }
+
     fun onRideCompleted(rideId: String) {
         viewModelScope.launch {
             dbReferenceListener.removeEventListener(rideOngoingListener)
             dbCompletedRidesListener.removeEventListener(rideCompletionListener)
             _rideState.value = RideState.RIDE_COMPLETED
-        }
-    }
-
-    fun resetData() {
-        Log.d(TAG, "reset data")
-        currentRideId = null
-        _clientToDestinationPath.value = null
-        _clearMap.value = Event(Unit)
-        dbAvailableDriversListener.addValueEventListener(availableDriversListener)
-        _rideState.value = RideState.SELECT_DESTINATION
-    }
-
-    fun onDestinationSelected(destinationId: String) {
-        viewModelScope.launch {
-            val destinationLatLng =
-                repository.getGeocoding(destinationId)
-
-            destinationLatLng?.let {
-                _rideState.value = RideState.SELECT_CAR
-                destination.value = LatLng(it.results[0].geometry.location.lat,
-                    it.results[0].geometry.location.lng)
-                updateUserCurrentLocation()
-
-                _clientToDestinationPath.value =
-                    repository.getDirection(origin.value!!,
-                        destination.value!!)
-
-            }
-        }
-    }
-
-    private fun listenAvailableDrivers() {
-        viewModelScope.launch {
-            dbAvailableDriversListener = repository.listenAvailableDrivers()
-            dbAvailableDriversListener.addValueEventListener(availableDriversListener)
         }
     }
 
@@ -296,15 +321,19 @@ class HomeViewModel @Inject constructor(
         return res
     }
 
-    fun getPlacesPrediction(query: String) {
-        viewModelScope.launch {
-            placesPredictions.value = repository.getPredictions(query)
-            _rideState.value = RideState.SELECT_DESTINATION
-        }
+    fun resetData() {
+        clearOriginAndDestination()
+        currentRideId = null
+        _clientToDestinationPath.value = null
+        _clearData.value = Event(Unit)
+        dbAvailableDriversListener.addValueEventListener(availableDriversListener)
+        _rideState.value = RideState.SELECT_DESTINATION
     }
 
-    private fun updateUserCurrentLocation() {
-        _requestCurrentLocation.value = Event(Unit)
+    private fun clearOriginAndDestination() {
+        origin = MutableLiveData<LatLng>()
+        updateUserCurrentLocation()
+        destination = MutableLiveData<LatLng>()
     }
 }
 

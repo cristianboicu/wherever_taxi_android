@@ -24,6 +24,7 @@
             setSearchVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="@dimen/small_value"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,9 +34,8 @@
                 android:id="@+id/search_layout_pickup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:layout_marginHorizontal="@dimen/small_value"
-                android:layout_marginTop="@dimen/medium_value"
+                android:layout_marginTop="@dimen/small_value"
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -49,14 +49,13 @@
                     android:layout_weight="3"
                     android:background="@drawable/bg_where_to"
                     android:drawableStart="@drawable/ic_search"
-                    android:hint="@string/where_to"
+                    android:hint="@string/current_location"
                     android:imeOptions="actionDone"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:onTextChanged="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
+                    android:onTextChanged="@{() -> viewModel.getPlacesPrediction(etPickupPoint.getText().toString())}"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/black" />
-
+                    android:textColorHint="@color/gray_border" />
             </LinearLayout>
 
             <LinearLayout
@@ -64,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/small_value"
-                android:layout_marginTop="@dimen/medium_value"
+                android:layout_marginTop="@dimen/small_value"
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -145,7 +144,7 @@
 
         <LinearLayout
             android:id="@+id/layout_ride_accepted"
-            setAcceptedRideData="@{viewModel.currentRideData}"
+            setAcceptedRideData="@{viewModel.ongoingRideData}"
             setRideAcceptedVisibility="@{viewModel.rideState}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -1,6 +1,7 @@
 package com.cristianboicu.wherevertaxi.data.repository
 
 import android.app.Activity
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.cristianboicu.wherevertaxi.data.local.ILocalDataSource
 import com.cristianboicu.wherevertaxi.data.model.geocoding.GeocodingResponse
@@ -34,7 +35,7 @@ class Repository @Inject constructor(
     }
 
 
-    override suspend fun saveNewUserData(uid: String, user: User): Boolean {
+    override suspend fun saveUserData(uid: String, user: User): Boolean {
         try {
             val remoteUser = remoteDataSource.getRemoteUser(uid)
             if (remoteUser == null) {
@@ -78,7 +79,7 @@ class Repository @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-
+            Log.d("Repository", e.message.toString())
         }
     }
 
@@ -95,7 +96,7 @@ class Repository @Inject constructor(
                 updatedUser.phone,
                 updatedUser.email))
         } catch (e: Exception) {
-
+            Log.d("Repository", e.message.toString())
         }
     }
 
@@ -138,6 +139,7 @@ class Repository @Inject constructor(
             localDataSource.savePaymentMethod(localPaymentMethod)
             true
         } catch (e: Exception) {
+            Log.d("Repository", e.message.toString())
             false
         }
     }
@@ -161,11 +163,12 @@ class Repository @Inject constructor(
             val toDestination =
                 destination.latitude.toString() + "," + destination.longitude.toString()
 
-            val res = remoteDataSource.getDirection(fromOrigin, toDestination, API_KEY)
+            val res = remoteDataSource.getDirection(fromOrigin, toDestination)
             val shape: String? = res?.routes?.get(0)?.overviewPolyline?.points
             shape
 
         } catch (e: Exception) {
+            Log.d("Repository", e.message.toString())
             null
         }
     }
@@ -174,8 +177,16 @@ class Repository @Inject constructor(
         return remoteDataSource.getPredictions(query)
     }
 
-    override suspend fun getGeocoding(place_id: String): GeocodingResponse? {
-        return remoteDataSource.getGeocoding(place_id)
+    override suspend fun getGeocoding(place_id: String): LatLng? {
+        return try {
+            val res= remoteDataSource.getGeocoding(place_id)
+            res?.let {
+                LatLng(it.results[0].geometry.location.lat,
+                    it.results[0].geometry.location.lng)
+            }
+        } catch (e: Exception){
+            null
+        }
     }
 
     override suspend fun getReverseGeocoding(placeLatLng: LatLng): String {

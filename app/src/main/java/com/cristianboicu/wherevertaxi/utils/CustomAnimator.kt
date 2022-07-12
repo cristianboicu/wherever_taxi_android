@@ -5,11 +5,14 @@ import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.util.Log
 import android.util.Property
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 
 
-class MarkerAnimation {
+class CustomAnimator {
     var trips: ArrayList<LatLng> = arrayListOf()
     var marker: Marker? = null
     var latLngInterpolator: LatLngInterpolator = LatLngInterpolator.Spherical()
@@ -22,6 +25,44 @@ class MarkerAnimation {
 //        animateMarker()
 //    }
     companion object {
+
+        fun animateViewIn(view: View){
+            val alphaAnimation = AlphaAnimation(0.0f, 1.0f)
+            alphaAnimation.duration = 300
+            alphaAnimation.repeatCount = 1
+            view.startAnimation(alphaAnimation)
+
+            alphaAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(p0: Animation?) {
+                    Log.d("Animation", "suka blea")
+                    view.visibility = View.VISIBLE
+                }
+
+                override fun onAnimationEnd(p0: Animation?) {
+                }
+
+                override fun onAnimationRepeat(p0: Animation?) {
+                }
+            })
+        }
+        fun animateViewOut(view: View){
+            val alphaAnimation = AlphaAnimation(1f, 0.0f)
+            alphaAnimation.duration = 300
+            alphaAnimation.repeatCount = 1
+            view.startAnimation(alphaAnimation)
+
+            alphaAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(p0: Animation?) {
+                }
+
+                override fun onAnimationEnd(p0: Animation?) {
+                    view.visibility = View.GONE
+                }
+
+                override fun onAnimationRepeat(p0: Animation?) {
+                }
+            })
+        }
 
         fun animateMarkerToICS(
             marker: Marker?,

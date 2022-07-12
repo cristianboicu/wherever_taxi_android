@@ -23,7 +23,7 @@ import javax.inject.Inject
 class FirebaseApi
 @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val database: DatabaseReference,
+    private val database: DatabaseReference
 ) : IFirebaseApi {
 
     private val TAG = "FirebaseApi"
@@ -33,19 +33,54 @@ class FirebaseApi
     }
 
     override suspend fun saveRemoteUser(uid: String, user: User) {
-        database.child("users").child(uid).setValue(user)
+        database.child(USERS_PATH).child(uid).setValue(user)
     }
 
     override suspend fun getRemoteUser(uid: String): User? {
         return try {
             val res =
-                database.child(ProjectConstants.USERS_PATH).child(uid).get().await()
+                database.child(USERS_PATH).child(uid).get().await()
             val fetchedUser = res.getValue(User::class.java)
             Log.d(TAG, "Got value $fetchedUser")
             fetchedUser
         } catch (e: Exception) {
-            Log.d(TAG, "Error getting data ${e.message}")
+            Log.e(TAG, e.message.toString())
             null
+        }
+    }
+
+    override suspend fun updateUserData(uid: String, updatedUser: User) {
+        try {
+            database.child(USERS_PATH).child(uid).child("fname")
+                .setValue(updatedUser.fname).await()
+            database.child(USERS_PATH).child(uid).child("sname")
+                .setValue(updatedUser.sname).await()
+            database.child(USERS_PATH).child(uid).child("email")
+                .setValue(updatedUser.email).await()
+        } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
+        }
+    }
+
+    override suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String? {
+        return try {
+            val key = database.child(USERS_PATH).child(uid).child(PAYMENT_PATH).push()
+            key.setValue(remotePayment)
+                .await()
+            key.key
+        } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
+            null
+        }
+    }
+
+    override fun logOutUser(): Boolean {
+        return try {
+            firebaseAuth.signOut()
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
+            false
         }
     }
 
@@ -59,23 +94,10 @@ class FirebaseApi
                 completedRide?.rideId = ride.key
                 completedRides.add(completedRide)
             }
-            Log.d(TAG, "Got value ${completedRides.toString()}")
             completedRides
         } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
             completedRides
-        }
-    }
-
-    override suspend fun updateUserData(uid: String, updatedUser: User) {
-        try {
-            database.child(ProjectConstants.USERS_PATH).child(uid).child("fname")
-                .setValue(updatedUser.fname).await()
-            database.child(ProjectConstants.USERS_PATH).child(uid).child("sname")
-                .setValue(updatedUser.sname).await()
-            database.child(ProjectConstants.USERS_PATH).child(uid).child("email")
-                .setValue(updatedUser.email).await()
-        } catch (e: Exception) {
-
         }
     }
 
@@ -88,11 +110,9 @@ class FirebaseApi
             for (driver in res.children) {
                 availableDrivers.add(driver.getValue(Driver::class.java))
             }
-
-            Log.d(TAG, "Got value $availableDrivers")
             availableDrivers
         } catch (e: Exception) {
-            Log.d(TAG, "Got drivers error ${e.message}")
+            Log.e(TAG, e.message.toString())
             null
         }
     }
@@ -113,15 +133,7 @@ class FirebaseApi
         try {
             database.child(RIDE_REQUEST_PATH).child(rideId).removeValue().await()
         } catch (e: Exception) {
-        }
-    }
-
-    override fun logOutUser(): Boolean {
-        return try {
-            firebaseAuth.signOut()
-            true
-        } catch (e: Exception) {
-            false
+            Log.e(TAG, e.message.toString())
         }
     }
 
@@ -131,23 +143,9 @@ class FirebaseApi
         return try {
             val key = database.child(RIDE_REQUEST_PATH).push().key
             database.child(RIDE_REQUEST_PATH).child(key!!).setValue(rideRequest).await()
-            Log.d(TAG, "succes adding ride request")
             key
         } catch (e: Exception) {
-            Log.d(TAG, "error adding ride request ${e.message}")
-            null
-        }
-    }
-
-    override suspend fun savePaymentMethod(uid: String, remotePayment: PaymentMethod): String? {
-        return try {
-            val key = database.child(USERS_PATH).child(uid).child(PAYMENT_PATH).push()
-            key.setValue(remotePayment)
-                .await()
-            Log.d(TAG, "succes adding payment")
-            key.key
-        } catch (e: Exception) {
-            Log.d(TAG, "error adding payment ${e.message}")
+            Log.e(TAG, e.message.toString())
             null
         }
     }

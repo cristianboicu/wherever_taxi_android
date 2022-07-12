@@ -13,13 +13,20 @@ buildscript {
         classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.0-rc02'
     }
     ext {
-        nav_version = '2.4.2'
+        nav_version = '2.5.0'
         maps_version = '18.0.2'
         version_room = '2.4.2'
         lifecycle_version = '2.4.1'
         material_version = '1.6.1'
         version_retrofit = '2.9.0'
         dagger_hilt_version = '2.38.1'
+        hamcrestVersion = '2.2'
+        androidXTestCoreVersion = '1.4.0'
+        robolectricVersion = '4.7.3'
+        archTestingVersion = '2.1.0'
+        coroutinesVersion = '1.6.0-native-mt'
+        archTestingVersion = '2.1.0'
+        mockito_core_version = '2.28.2'
     }
 }
 

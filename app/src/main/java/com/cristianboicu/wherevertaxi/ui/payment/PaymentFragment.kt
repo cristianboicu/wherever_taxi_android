@@ -15,12 +15,16 @@ import androidx.navigation.fragment.findNavController
 import com.cristianboicu.wherevertaxi.R
 import com.cristianboicu.wherevertaxi.databinding.FragmentPaymentBinding
 import com.cristianboicu.wherevertaxi.databinding.ItemCardBinding
+import com.cristianboicu.wherevertaxi.utils.Util.getSelectedPayment
+import com.cristianboicu.wherevertaxi.utils.Util.saveSelectedPayment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.properties.Delegates
 
 
 @AndroidEntryPoint
 class PaymentFragment : Fragment() {
     lateinit var viewModel: PaymentViewModel
+    private var selectedId by Delegates.notNull<Int>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +36,9 @@ class PaymentFragment : Fragment() {
         viewModel = ViewModelProvider(this)[PaymentViewModel::class.java]
         binding.viewModel = viewModel
 
+        setUpSelectedPayment(binding)
         setUpObservers(binding, container!!)
+
         return binding.root
     }
 
@@ -51,7 +57,6 @@ class PaymentFragment : Fragment() {
 
         viewModel.paymentMethods.observe(viewLifecycleOwner) {
             Log.d("Payment", it.size.toString())
-
             val root = binding.layoutPayments
 
             for (i in it.indices) {
@@ -60,6 +65,9 @@ class PaymentFragment : Fragment() {
 
                 element.tvCardNumber.text = "**** " + it[i].cardNumber.subSequence(0, 4)
                 element.root.id = i
+                if (i == selectedId) {
+                    element.rbSelected.isChecked = true
+                }
                 root.addView(element.root)
             }
             setUpUi(binding)
@@ -71,13 +79,14 @@ class PaymentFragment : Fragment() {
         binding.layoutMain.getViewsByType(LinearLayout::class.java).apply {
             for (item in this) {
                 item.setOnClickListener {
-                    Log.d("Payment", item.id.toString())
                     binding.layoutMain.getViewsByType(RadioButton::class.java).apply {
                         for (i in this) {
                             i.isChecked = false
                         }
                     }
                     it.findViewById<RadioButton>(R.id.rb_selected).isChecked = true
+                    saveSelectedPayment(requireActivity(), item.id)
+                    Log.d("Payment", it.id.toString())
                 }
             }
         }
@@ -94,5 +103,13 @@ class PaymentFragment : Fragment() {
                     add(tClass.cast(child))
             }
         }.filterNotNull()
+    }
+
+    private fun setUpSelectedPayment(binding: FragmentPaymentBinding) {
+        selectedId = getSelectedPayment(requireActivity())
+
+        if (selectedId == -1 || selectedId > 100) {
+            binding.layoutCash.findViewById<RadioButton>(R.id.rb_selected).isChecked = true
+        }
     }
 }

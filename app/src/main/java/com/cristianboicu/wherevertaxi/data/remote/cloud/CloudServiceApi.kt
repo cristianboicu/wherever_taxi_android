@@ -13,13 +13,11 @@ class CloudServiceApi @Inject constructor(
     private val placesApi: IPlacesApi,
 ) : ICloudServiceApi {
 
-    //use project constants for api_key
     override suspend fun getDirection(
         origin: String,
-        destination: String,
-        apiKey: String,
+        destination: String
     ): Response<DirectionResponses> {
-        return apiService.getDirection(origin, destination, apiKey)
+        return apiService.getDirection(origin, destination, ProjectConstants.API_KEY)
     }
 
     override suspend fun getGeocoding(

@@ -24,7 +24,7 @@ interface IRepository {
 
     suspend fun refreshAuthenticatedUser()
 
-    suspend fun saveNewUserData(uid: String, user: User): Boolean
+    suspend fun saveUserData(uid: String, user: User): Boolean
 
     fun getAuthenticatedUserId(): String?
 
@@ -38,7 +38,7 @@ interface IRepository {
 
     suspend fun getGeocoding(
         place_id: String,
-    ): GeocodingResponse?
+    ): LatLng?
 
     suspend fun getReverseGeocoding(
         placeLatLng: LatLng,

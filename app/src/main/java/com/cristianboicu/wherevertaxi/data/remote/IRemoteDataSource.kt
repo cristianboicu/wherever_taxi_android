@@ -33,8 +33,7 @@ interface IRemoteDataSource {
 
     suspend fun getDirection(
         origin: String,
-        destination: String,
-        apiKey: String,
+        destination: String
     ): DirectionResponses?
 
     suspend fun getGeocoding(

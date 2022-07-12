@@ -18,5 +18,7 @@ interface ILocalDataSource {
 
     suspend fun savePaymentMethod(localPaymentMethod: LocalPaymentMethod)
 
+    suspend fun deletePaymentMethod(id: String)
+
     fun observeLocalPaymentMethods(uid: String): LiveData<List<LocalPaymentMethod>>
 }

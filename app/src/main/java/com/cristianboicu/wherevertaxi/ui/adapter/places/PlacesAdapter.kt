@@ -61,6 +61,6 @@ class PlaceDiffCallback : DiffUtil.ItemCallback<AutocompletePrediction>() {
     }
 }
 
-class PlacesListener(val clickListener: (placeId: String) -> Unit) {
-    fun onClick(placeId: String) = clickListener(placeId)
+class PlacesListener(val clickListener: (placeId: String, placePrimary: String) -> Unit) {
+    fun onClick(placeId: String, placePrimary: String) = clickListener(placeId, placePrimary)
 }

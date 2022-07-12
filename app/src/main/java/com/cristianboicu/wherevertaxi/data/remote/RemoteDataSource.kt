@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(
     private val firebaseApi: IFirebaseApi,
-    private val cloudServiceApi: ICloudServiceApi,
+    private val cloudServiceApi: ICloudServiceApi
 ) : IRemoteDataSource {
 
     override fun getLoggedUserId(): FirebaseUser? {
@@ -27,9 +27,7 @@ class RemoteDataSource @Inject constructor(
     }
 
     override suspend fun getRemoteUser(uid: String): User? {
-        val res = firebaseApi.getRemoteUser(uid)
-        Log.d("RemoteDataSource", "Got value $res")
-        return res
+        return firebaseApi.getRemoteUser(uid)
     }
 
     override suspend fun listenAvailableDrivers(): DatabaseReference {
@@ -59,14 +57,12 @@ class RemoteDataSource @Inject constructor(
     override suspend fun getDirection(
         origin: String,
         destination: String,
-        apiKey: String,
     ): DirectionResponses? {
         return try {
-            val res = cloudServiceApi.getDirection(origin, destination, apiKey)
-            Log.d("RemoteDataSource", "Got direction $res")
+            val res = cloudServiceApi.getDirection(origin, destination)
             res.body()
         } catch (e: Exception) {
-            Log.d("RemoteDataSource", "Got direction error")
+            Log.d("RemoteDataSource", e.message.toString())
             null
         }
     }
@@ -75,10 +71,9 @@ class RemoteDataSource @Inject constructor(
     override suspend fun getGeocoding(place_id: String): GeocodingResponse? {
         return try {
             val res = cloudServiceApi.getGeocoding(place_id)
-            Log.d("RemoteDataSource", "Got geocoding $res")
             res.body()
         } catch (e: Exception) {
-            Log.d("RemoteDataSource", "Got geocoding error")
+            Log.d("RemoteDataSource", e.message.toString())
             null
         }
     }
@@ -90,7 +85,7 @@ class RemoteDataSource @Inject constructor(
                 return it.results[0].formattedAddress
             }
         } catch (e: Exception) {
-            Log.d("RemoteDataSource", "Got geocoding error")
+            Log.d("RemoteDataSource", e.message.toString())
             null
         }
     }

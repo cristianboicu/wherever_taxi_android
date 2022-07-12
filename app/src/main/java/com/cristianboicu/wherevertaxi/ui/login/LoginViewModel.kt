@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(private val repository: IRepository) : 
         Log.d("VerificationFragment", "save new user to db ${user.payment}")
 
         viewModelScope.launch {
-            if (!repository.saveNewUserData(uid, user)) {
+            if (!repository.saveUserData(uid, user)) {
                 Log.d("VerificationFragment", "it is not a new user so just refresh db")
                 repository.refreshAuthenticatedUser()
             }

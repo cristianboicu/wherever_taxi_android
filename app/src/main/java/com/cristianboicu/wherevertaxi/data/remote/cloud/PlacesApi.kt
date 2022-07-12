@@ -36,10 +36,8 @@ class PlacesApi @Inject constructor(private val placesClient: PlacesClient) : IP
             for (prediction in result.autocompletePredictions) {
                 predictionsList.add(prediction)
             }
-            Log.d(TAG, "Success getting predictions")
-
         } catch (e: Exception) {
-            Log.d(TAG, "Error getting predictions")
+            Log.d(TAG, e.message.toString())
         }
 
         return predictionsList
