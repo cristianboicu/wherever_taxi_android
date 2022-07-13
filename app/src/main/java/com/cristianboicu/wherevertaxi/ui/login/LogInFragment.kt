@@ -48,7 +48,6 @@ class LogInFragment : Fragment() {
         binding.btnSignInGoogle.tvSignInWith.text = this.getString(R.string.sign_in_with_google)
 
         binding.btnSignIn.setOnClickListener {
-            binding.editTextPhone.setText("+37368026689")
             binding.editTextPhone.text?.let { phoneNumber ->
                 if (phoneNumber.isNotEmpty() && phoneNumber.isNotBlank()) {
                     phnb = phoneNumber.toString()

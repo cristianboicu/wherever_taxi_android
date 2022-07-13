@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_sheet_layout"
         android:layout_width="match_parent"
-        android:layout_height="650dp"
+        android:layout_height="625dp"
         android:background="@drawable/shape_rounded_dialog"
         app:behavior_hideable="false"
         app:behavior_peekHeight="270dp"
@@ -82,8 +82,7 @@
                     android:inputType="text"
                     android:maxLines="1"
                     android:onTextChanged="@{() -> viewModel.getPlacesPrediction(etWhereTo.getText().toString())}"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/black" />
+                    android:textColor="@color/black" />
 
             </LinearLayout>
 

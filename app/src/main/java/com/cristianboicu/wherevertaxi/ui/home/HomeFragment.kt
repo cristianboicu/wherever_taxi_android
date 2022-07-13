@@ -116,7 +116,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun setUpObserver() {
 
         viewModel.driverLocation.observe(viewLifecycleOwner, EventObserver { it ->
-            removeAllDriverMarkers()
+//            removeAllDriverMarkers()
             drawCurrentDriverMarker(it)
             CustomAnimator.animateMarkerToICS(driverMarker, it)
         })
@@ -152,7 +152,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         })
 
         viewModel.userLocationAddressPlain.observe(viewLifecycleOwner) {
-            binding.bottomSheet.etPickupPoint.setText(it)
+            binding.bottomSheet.etPickupPoint.hint = it
         }
     }
 
@@ -165,7 +165,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                     .position(position).icon(resizedBitmapIcon.let {
                         BitmapDescriptorFactory.fromBitmap(it)
                     }))
-
         }
     }
 

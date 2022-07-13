@@ -87,7 +87,7 @@ class HomeViewModel @Inject constructor(
 
     private val availableDriversListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            _availableDrivers.value = dataSnapshot.getValue<HashMap<String, AvailableDriver>>()
+            _availableDrivers.value = dataSnapshot.getValue<Map<String, AvailableDriver>>()
 
             _availableDrivers.value?.let {
                 val markerList = mutableListOf<LatLng>()
@@ -109,6 +109,7 @@ class HomeViewModel @Inject constructor(
             if (dataSnapshot.exists()) {
                 val ongoingRideData = dataSnapshot.getValue<OngoingRide>()
                 ongoingRideData?.let {
+                    _availableDriverMarkers.value = emptyList()
                     Log.d(TAG, "ride accepted")
                     this@HomeViewModel.ongoingRideData.value = ongoingRideData
                     onRideAccepted(currentRideId!!)
